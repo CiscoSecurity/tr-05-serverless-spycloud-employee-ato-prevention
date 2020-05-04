@@ -1,7 +1,17 @@
+import json
+from http import HTTPStatus
+
 from authlib.jose import jwt
 from authlib.jose.errors import JoseError
 from flask import request, current_app, jsonify
-from werkzeug.exceptions import Forbidden, BadRequest
+
+from api.errors import (
+    SpycloudInternalServerError,
+    SpycloudInvalidCredentialsError,
+    SpycloudNotFoundError,
+    SpycloudUnexpectedResponseError,
+    BadRequestError
+)
 
 
 def get_jwt():
@@ -19,7 +29,7 @@ def get_jwt():
         assert scheme.lower() == 'bearer'
         return jwt.decode(token, current_app.config['SECRET_KEY'])
     except (KeyError, ValueError, AssertionError, JoseError):
-        raise Forbidden('Invalid Authorization Bearer JWT.')
+        return {}
 
 
 def get_json(schema):
@@ -34,13 +44,38 @@ def get_json(schema):
 
     data = request.get_json(force=True, silent=True, cache=False)
 
-    message = schema.validate(data)
+    error = schema.validate(data) or None
 
-    if message:
-        raise BadRequest(message)
+    if error:
+        raise BadRequestError(
+            f'Invalid JSON payload received. {json.dumps(error)}.'
+        )
 
     return data
 
 
 def jsonify_data(data):
     return jsonify({'data': data})
+
+
+def jsonify_errors(error):
+    return jsonify({'errors': [error]})
+
+
+def get_response_data(response):
+
+    if response.ok:
+        return response.json()
+
+    else:
+        if response.status_code == HTTPStatus.UNAUTHORIZED:
+            raise SpycloudInvalidCredentialsError()
+
+        if response.status_code == HTTPStatus.NOT_FOUND:
+            raise SpycloudNotFoundError()
+
+        if response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR:
+            raise SpycloudInternalServerError()
+
+        else:
+            raise SpycloudUnexpectedResponseError(response)
