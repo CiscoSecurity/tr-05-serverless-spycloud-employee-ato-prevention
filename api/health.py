@@ -1,11 +1,25 @@
+import requests
 from flask import Blueprint
 
-from api.utils import get_jwt, jsonify_data
+from api.utils import get_jwt, jsonify_data, url_for, get_response_data
 
 health_api = Blueprint('health', __name__)
 
 
+def check_spycloud_health():
+    url = url_for('watchlist/example.org')
+
+    headers = {
+        'Accept': 'application/json',
+        'X-API-Key': get_jwt().get('key', '')
+    }
+
+    response = requests.get(url, headers=headers)
+
+    return get_response_data(response)
+
+
 @health_api.route('/health', methods=['POST'])
 def health():
-    _ = get_jwt()
+    check_spycloud_health()
     return jsonify_data({'status': 'ok'})

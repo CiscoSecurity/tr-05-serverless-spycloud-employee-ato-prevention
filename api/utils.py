@@ -1,3 +1,4 @@
+from typing import Optional
 import json
 from http import HTTPStatus
 
@@ -12,6 +13,13 @@ from api.errors import (
     SpycloudUnexpectedResponseError,
     BadRequestError
 )
+
+
+def url_for(endpoint) -> Optional[str]:
+
+    return current_app.config['SPYCLOUD_API_URL'].format(
+        endpoint=endpoint,
+    )
 
 
 def get_jwt():
