@@ -44,9 +44,17 @@ class SpycloudInvalidCredentialsError(TRError):
         )
 
 
+class SpycloudForbidenError(TRError):
+    def __init__(self):
+        super().__init__(
+            PERMISSION_DENIED,
+            'The request has API key without necessary permissions.'
+        )
+
+
 class SpycloudUnexpectedResponseError(TRError):
     def __init__(self, payload):
-        error_payload = payload.json().get('errors', [])
+        error_payload = payload.json().get('message', [])
 
         super().__init__(
             UNKNOWN,
