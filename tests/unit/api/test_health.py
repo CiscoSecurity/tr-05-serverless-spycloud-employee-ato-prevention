@@ -1,8 +1,16 @@
 from http import HTTPStatus
 
 from pytest import fixture
+from unittest import mock
 
 from .utils import headers
+from tests.unit.mock_for_tests import (
+    WATCHLIST_RESPONSE_MOCK,
+    EXPECTED_RESPONSE_404_ERROR,
+    EXPECTED_RESPONSE_500_ERROR,
+    EXPECTED_RESPONSE_401_ERROR,
+    EXPECTED_RESPONSE_403_ERROR
+)
 
 
 def routes():
@@ -14,11 +22,64 @@ def route(request):
     return request.param
 
 
-def test_health_call_with_invalid_jwt_failure(route, client, invalid_jwt):
-    response = client.post(route, headers=headers(invalid_jwt))
-    assert response.status_code == HTTPStatus.FORBIDDEN
+@fixture(scope='function')
+def spycloud_api_request():
+    with mock.patch('requests.get') as mock_request:
+        yield mock_request
 
 
-def test_health_call_success(route, client, valid_jwt):
+def spycloud_api_response(*, ok, status_error=None, payload=None):
+    mock_response = mock.MagicMock()
+
+    mock_response.ok = ok
+
+    if ok:
+        payload = WATCHLIST_RESPONSE_MOCK
+
+    else:
+        mock_response.status_code = status_error
+
+    mock_response.json = lambda: payload
+
+    return mock_response
+
+
+def test_health_call_success(route, client, valid_jwt, spycloud_api_request):
+    spycloud_api_request.return_value = spycloud_api_response(ok=True)
     response = client.post(route, headers=headers(valid_jwt))
     assert response.status_code == HTTPStatus.OK
+    assert response.get_json() == {'data': {'status': 'ok'}}
+
+
+def test_health_call_auth_error(route, client, valid_jwt,
+                                spycloud_api_request):
+    spycloud_api_request.return_value = spycloud_api_response(ok=False,
+                                                              status_error=401)
+    response = client.post(route, headers=headers(valid_jwt))
+    assert response.status_code == HTTPStatus.OK
+    assert response.get_json() == EXPECTED_RESPONSE_401_ERROR
+
+
+def test_health_call_permission_error(route, client, valid_jwt,
+                                      spycloud_api_request):
+    spycloud_api_request.return_value = spycloud_api_response(ok=False,
+                                                              status_error=403)
+    response = client.post(route, headers=headers(valid_jwt))
+    assert response.status_code == HTTPStatus.OK
+    assert response.get_json() == EXPECTED_RESPONSE_403_ERROR
+
+
+def test_health_call_404(route, client, valid_jwt, spycloud_api_request):
+    spycloud_api_request.return_value = spycloud_api_response(ok=False,
+                                                              status_error=404)
+    response = client.post(route, headers=headers(valid_jwt))
+    assert response.status_code == HTTPStatus.OK
+    assert response.get_json() == EXPECTED_RESPONSE_404_ERROR
+
+
+def test_health_call_500(route, client, valid_jwt, spycloud_api_request):
+    spycloud_api_request.return_value = spycloud_api_response(ok=False,
+                                                              status_error=500)
+    response = client.post(route, headers=headers(valid_jwt))
+    assert response.status_code == HTTPStatus.OK
+    assert response.get_json() == EXPECTED_RESPONSE_500_ERROR
