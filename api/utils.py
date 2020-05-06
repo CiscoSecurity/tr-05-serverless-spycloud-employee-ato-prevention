@@ -78,16 +78,16 @@ def get_response_data(response):
 
     else:
         if response.status_code == HTTPStatus.UNAUTHORIZED:
-            raise SpycloudInvalidCredentialsError()
+            raise SpycloudInvalidCredentialsError
 
         if response.status_code == HTTPStatus.FORBIDDEN:
-            raise SpycloudForbidenError()
+            raise SpycloudForbidenError
 
         if response.status_code == HTTPStatus.NOT_FOUND:
-            raise SpycloudNotFoundError()
+            raise SpycloudNotFoundError
 
         if response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR:
-            raise SpycloudInternalServerError()
+            raise SpycloudInternalServerError
 
         else:
             raise SpycloudUnexpectedResponseError(response)
