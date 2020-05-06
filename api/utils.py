@@ -73,21 +73,18 @@ def jsonify_errors(error):
 
 def get_response_data(response):
 
+    expected_response_errors = {
+        HTTPStatus.UNAUTHORIZED: SpycloudInvalidCredentialsError,
+        HTTPStatus.FORBIDDEN: SpycloudForbidenError,
+        HTTPStatus.NOT_FOUND: SpycloudNotFoundError,
+        HTTPStatus.INTERNAL_SERVER_ERROR: SpycloudInternalServerError
+    }
+
     if response.ok:
         return response.json()
 
     else:
-        if response.status_code == HTTPStatus.UNAUTHORIZED:
-            raise SpycloudInvalidCredentialsError
-
-        if response.status_code == HTTPStatus.FORBIDDEN:
-            raise SpycloudForbidenError
-
-        if response.status_code == HTTPStatus.NOT_FOUND:
-            raise SpycloudNotFoundError
-
-        if response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR:
-            raise SpycloudInternalServerError
-
+        if response.status_code in expected_response_errors:
+            raise expected_response_errors[response.status_code]
         else:
             raise SpycloudUnexpectedResponseError(response)
