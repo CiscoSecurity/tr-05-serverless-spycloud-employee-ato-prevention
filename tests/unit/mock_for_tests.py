@@ -24,7 +24,8 @@ BREACH_EMAIL_RESPONSE_MOCK = {
         {
             "city": "()",
             "domain": "example.org",
-            "infected_path": "C:/Users/Usama/AppData/Local/Temp/6210230526.exe",
+            "infected_path": "C:/Users/Usama/AppData/Local"
+                             "/Temp/6210230526.exe",
             "infected_time": "2020-03-26 16:56:49",
             "country": "()",
             "isp": "()",
