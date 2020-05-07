@@ -1,5 +1,5 @@
 import requests
-from flask import Blueprint
+from flask import Blueprint, current_app
 
 from api.utils import get_jwt, jsonify_data, url_for, get_response_data
 
@@ -10,7 +10,7 @@ def check_spycloud_health():
     url = url_for('watchlist/example.org')
 
     headers = {
-        'Accept': 'application/json',
+        **current_app.config['SPYCLOUD_BASE_HEADERS'],
         'X-API-Key': get_jwt().get('key', '')
     }
 
