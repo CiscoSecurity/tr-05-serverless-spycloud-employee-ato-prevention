@@ -1,3 +1,4 @@
+import re
 from uuid import uuid4
 from functools import partial
 from datetime import datetime
@@ -80,7 +81,7 @@ def get_relation(source, related, source_type):
             'value': source
         },
         'related': related,
-        'relation': 'Resolved_To',
+        'relation': 'Leaked_From',
     }
 
 
@@ -92,12 +93,26 @@ def get_severity(breach):
             return s_name
 
 
-def get_targets(breach):
-    target_url = breach.get('target_url')
-    if target_url:
+def get_targets(breach, observed_time):
+    target = breach.get('target_url')
+
+    if target:
+        ip = re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", target)
+        if ip:
+            target_type = 'ip'
+        else:
+            target_type = 'url'
         return {
-            'type': 'ip',
-            'value': breach['target_url']
+            'type': 'email',
+            'observables': [
+                {
+                    'value': target,
+                    'type': target_type
+                }
+            ],
+            'observed_time': {
+                'start_time': observed_time['start_time']
+            }
         }
     else:
         return []
@@ -108,7 +123,7 @@ def get_external_ids(breach):
     if breach.get('document_id'):
         external_ids.append(breach['document_id'])
     if breach.get('source_id'):
-        external_ids.append(breach['source_id'])
+        external_ids.append(str(breach['source_id']))
     if breach.get('infected_machine_id'):
         external_ids.append(breach['infected_machine_id'])
 
@@ -142,9 +157,12 @@ def extract_sightings(breach, output):
         'relations': relations,
         'external_ids': get_external_ids(breach),
         'severity': get_severity(breach),
-        'targets': get_targets(breach),
         **current_app.config['CTIM_SIGHTING_DEFAULT']
     }
+
+    targets = get_targets(breach, observed_time)
+    if targets:
+        doc['targets'] = [targets]
 
     return doc
 
