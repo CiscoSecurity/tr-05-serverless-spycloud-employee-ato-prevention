@@ -54,7 +54,7 @@ class SpycloudForbidenError(TRError):
 
 class SpycloudUnexpectedResponseError(TRError):
     def __init__(self, payload):
-        error_payload = payload.json().get('message', [])
+        error_payload = payload.json().get('errorMessage', [])
 
         super().__init__(
             UNKNOWN,
