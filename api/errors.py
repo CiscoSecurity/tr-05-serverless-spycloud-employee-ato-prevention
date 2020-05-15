@@ -62,6 +62,15 @@ class SpycloudUnexpectedResponseError(TRError):
         )
 
 
+class SpycloudTooManyRequestsError(TRError):
+    def __init__(self):
+        super().__init__(
+            TOO_MANY_REQUESTS,
+            'Too many requests have been made to '
+            'Spycloud. Please, try again later.'
+        )
+
+
 class BadRequestError(TRError):
     def __init__(self, error_message):
         super().__init__(
