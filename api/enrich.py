@@ -38,90 +38,69 @@ def group_observables(relay_input):
     return result
 
 
-def validate_spycloud_breach_outputs(observables):
-    # Return list of responses from Spycloud for all observables
+def validate_spycloud_outputs(observables):
 
-    outputs = []
+    breaches = []
+    catalogs = {}
     for observable in observables:
-        abuse_ipdb_output = get_spycloud_breach_outputs(
-            observable['value'])
 
-        if abuse_ipdb_output:
-            abuse_ipdb_output['observable'] = observable
-            outputs.append(abuse_ipdb_output)
+        headers = {
+            **current_app.config['SPYCLOUD_BASE_HEADERS'],
+            'X-API-Key': get_jwt().get('key', '')
+        }
 
-    return outputs
+        url = url_for(f'breach/data/emails/{observable["value"]}')
+
+        spycloud_breach_output = get_spycloud_breach_outputs(url, headers)
+
+        if spycloud_breach_output:
+            spycloud_breach_output['observable'] = observable
+            breaches.append(spycloud_breach_output)
+
+            for result in spycloud_breach_output['results']:
+
+                url = url_for(f'breach/catalog/{result["source_id"]}')
+
+                spycloud_breach_catalog = get_spycloud_breach_outputs(
+                    url, headers)
+                catalog = spycloud_breach_catalog['results'][0]
+                catalogs.update({catalog['id']: catalog})
+
+    return breaches, catalogs
 
 
-def get_spycloud_breach_outputs(spycloud_input):
-
-    url = url_for(f'breach/data/emails/{spycloud_input}')
-
-    headers = {
-        **current_app.config['SPYCLOUD_BASE_HEADERS'],
-        'X-API-Key': get_jwt().get('key', '')
-    }
-
+def get_spycloud_breach_outputs(url, headers):
     response = requests.get(url, headers=headers)
-
     return get_response_data(response)
 
 
-def get_relations(breach, observable):
+def get_relations(observable, catalog):
     relations = []
-    domain = breach.get('domain')
-    ips = breach.get('ip_addresses')
-    if domain:
-        relations.append(get_relation(domain, observable, 'domain'))
-    if ips:
-        for ip in ips:
-            relations.append(get_relation(ip, observable, 'ip'))
+    if catalog.get('site') and catalog.get('site') != 'n/a':
+        domain = catalog['site']
+        relation = {
+            'origin': 'Spycloud Breach Module',
+            'source': {
+                'type': 'domain',
+                'value': domain
+            },
+            'related': observable['value'],
+            'relation': 'Leaked_From',
+        }
+        relations.append(relation)
+
     return relations
 
 
-def get_relation(source, related, source_type):
-    return {
-        'origin': 'Spycloud Breach Module',
-        'source': {
-            'type': source_type,
-            'value': source
-        },
-        'related': related,
-        'relation': 'Leaked_From',
-    }
-
-
-def get_severity(breach):
-    severity_score = breach['severity']
-    for s_name, borders in \
-            current_app.config['SPYCLOUD_SEVERITY_SCORE_RELATIONS'].items():
-        if borders[0] <= severity_score <= borders[1]:
-            return s_name
-
-
-def get_targets(breach, observed_time):
-    target = breach.get('target_url')
-
-    if target:
-        ip = re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", target)
-        if ip:
-            target_type = 'ip'
-        else:
-            target_type = 'url'
-        return {
-            'type': 'email',
-            'observables': [
-                {
-                    'value': target,
-                    'type': target_type
-                }
-            ],
-            'observed_time': {
-                'start_time': observed_time['start_time']
-            }
-        }
+def get_severity(breach, catalog):
+    if not catalog['combo_list_flag']:
+        severity_score = breach['severity']
+        for s_name, borders in \
+                current_app.config['SPYCLOUD_SEVERITY_RELATIONS'].items():
+            if borders[0] <= severity_score <= borders[1]:
+                return s_name
     else:
-        return []
+        return 'Medium'
 
 
 def get_external_ids(breach):
@@ -136,7 +115,10 @@ def get_external_ids(breach):
     return external_ids
 
 
-def extract_sightings(breach, output):
+def extract_sightings(breach, output, catalogs):
+
+    catalog = catalogs[breach['source_id']]
+
     start_time = datetime.strptime(
         breach['spycloud_publish_date'], '%Y-%m-%dT%H:%M:%SZ'
     )
@@ -151,24 +133,31 @@ def extract_sightings(breach, output):
         'type': output['observable']['type']
     }
 
-    sighting_id = f'transient:{uuid4()}'
-
-    relations = get_relations(breach, observable)
+    target = {
+            'type': 'email',
+            'observables': [observable],
+            'observed_time': {
+                'start_time': observed_time['start_time']
+            }
+    }
 
     doc = {
-        'id': sighting_id,
+        'id': f'transient:{uuid4()}',
         'count': breach.get('sighting', 1),
         'observables': [observable],
         'observed_time': observed_time,
-        'relations': relations,
+        'relations': get_relations(observable, catalog),
         'external_ids': get_external_ids(breach),
-        'severity': get_severity(breach),
+        'severity': get_severity(breach, catalog),
+        'targets': [target],
+        'title': current_app.config['CTIM_DEFAULT_SIGHTING_TITLE'].format(
+            title=catalog['title']
+        ),
+        'source_uri': current_app.config['SPYCLOUD_UI_URL'].format(
+            uuid=catalog['uuid']
+        ),
         **current_app.config['CTIM_SIGHTING_DEFAULT']
     }
-
-    targets = get_targets(breach, observed_time)
-    if targets:
-        doc['targets'] = [targets]
 
     return doc
 
@@ -192,9 +181,10 @@ def observe_observables():
     if not observables:
         return jsonify_data({})
 
-    spycloud_breach_outputs = validate_spycloud_breach_outputs(observables)
+    spycloud_breach_outputs, spycloud_catalogs = validate_spycloud_outputs(
+        observables)
 
-    if not spycloud_breach_outputs:
+    if not spycloud_breach_outputs and spycloud_catalogs:
         return jsonify_data({})
 
     sightings = []
@@ -208,7 +198,8 @@ def observe_observables():
             breaches = breaches[:current_app.config['CTR_ENTITIES_LIMIT']]
 
         for breach in breaches:
-            sightings.append(extract_sightings(breach, output))
+            sightings.append(
+                extract_sightings(breach, output, spycloud_catalogs))
 
     relay_output = {}
 

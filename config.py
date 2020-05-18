@@ -11,6 +11,7 @@ class Config:
     SPYCLOUD_SOURCE_NAME = 'Spycloud'
 
     SPYCLOUD_API_URL = 'https://api.spycloud.io/enterprise-v2/{endpoint}'
+    SPYCLOUD_UI_URL = 'https://portal.spycloud.com/breach/catalog/{uuid}'
 
     SPYCLOUD_BASE_HEADERS = {
         'Accept': 'application/json',
@@ -22,7 +23,7 @@ class Config:
         'email': 'Email'
     }
 
-    SPYCLOUD_SEVERITY_SCORE_RELATIONS = {
+    SPYCLOUD_SEVERITY_RELATIONS = {
         'Low': (0, 2),
         'Medium': (3, 5),
         'High': (6, 25),
@@ -44,7 +45,9 @@ class Config:
         'type': 'sighting',
         'schema_version': CTIM_SCHEMA_VERSION,
         'source': SPYCLOUD_SOURCE_NAME,
-        'confidence': 'Medium',
+        'confidence': 'High',
         'title': 'Reported to Spycloud',
         'internal': False
     }
+
+    CTIM_DEFAULT_SIGHTING_TITLE = 'Present in {title}'
