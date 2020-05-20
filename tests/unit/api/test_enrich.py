@@ -9,7 +9,9 @@ from tests.unit.mock_for_tests import (
     EXPECTED_RESPONSE_401_ERROR,
     EXPECTED_RESPONSE_403_ERROR,
     EXPECTED_RESPONSE_500_ERROR,
-    EXPECTED_RESPONSE_404_ERROR
+    EXPECTED_RESPONSE_404_ERROR,
+    CATALOG_17494_RESPONSE_MOCK,
+    CATALOG_17551_RESPONSE_MOCK
 )
 
 
@@ -82,7 +84,11 @@ def valid_json():
 def test_enrich_call_success(route, client, valid_jwt, valid_json,
                              spycloud_api_request):
 
-    spycloud_api_request.return_value = spycloud_api_response(ok=True)
+    spycloud_api_request.side_effect = (
+        spycloud_api_response(ok=True),
+        spycloud_api_response(ok=True, payload=CATALOG_17551_RESPONSE_MOCK),
+        spycloud_api_response(ok=True, payload=CATALOG_17494_RESPONSE_MOCK),
+    )
 
     response = client.post(
         route, headers=headers(valid_jwt), json=valid_json

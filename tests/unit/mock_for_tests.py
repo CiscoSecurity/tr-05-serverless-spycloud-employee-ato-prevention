@@ -68,6 +68,75 @@ BREACH_EMAIL_RESPONSE_MOCK = {
 }
 
 
+CATALOG_17551_RESPONSE_MOCK = {
+    "cursor": "",
+    "hits": 1,
+    "results": [
+        {
+            "confidence": 3,
+            "description": "test description for 17551",
+            "title": "Vidar Stealer",
+            "type": "PRIVATE",
+            "acquisition_date": "2020-04-15T00:00:00Z",
+            "site": "n/a",
+            "spycloud_publish_date": "2020-04-16T00:00:00Z",
+            "site_description": "test site description for 17551",
+            "uuid": "3a7fc3d4-2f57-4076-951c-287332a4d1f8",
+            "num_records": 1107872,
+            "id": 17551,
+            "assets": {
+                "username": 540183,
+                "city": 1107503,
+                "target_url": 1107872,
+                "infected_time": 1107503,
+                "user_browser": 93,
+                "country": 1107503,
+                "ip_addresses": 1097638,
+                "isp": 1107503,
+                "infected_path": 1107503,
+                "postal_code": 791450,
+                "password": 1107872,
+                "email": 567689,
+                "infected_machine_id": 1107503
+            }
+        }
+    ]
+}
+
+
+CATALOG_17494_RESPONSE_MOCK = {
+    "cursor": "",
+    "hits": 1,
+    "results": [
+        {
+            "confidence": 3,
+            "description": "test description for 17494",
+            "title": "Russian Password Stealer",
+            "type": "PRIVATE",
+            "acquisition_date": "2020-04-01T00:00:00Z",
+            "site": "n/a",
+            "spycloud_publish_date": "2020-04-02T00:00:00Z",
+            "site_description": "test site description for 17494",
+            "uuid": "1293a093-5b3b-42c5-aa90-d5784ea8374f",
+            "num_records": 3142306,
+            "id": 17494,
+            "assets": {
+                "username": 1563727,
+                "city": 330,
+                "target_url": 3142306,
+                "infected_machine_id": 3142306,
+                "user_browser": 3142279,
+                "country": 3142289,
+                "ip_addresses": 3049094,
+                "infected_path": 3856,
+                "password": 3142306,
+                "email": 1578579
+            }
+        }
+    ]
+}
+
+
 EXPECTED_RESPONSE_401_ERROR = {
     'errors': [
         {
@@ -116,8 +185,66 @@ EXPECTED_SUCCESS_RESPONSE = {
             'count': 2,
             'docs': [
                 {
-                    'confidence': 'Medium',
+                    'confidence': 'High',
                     'count': 1,
+                    'data': {
+                        'columns': [
+                            {
+                                'name': 'city',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'infected_path',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'infected_time',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'country',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'isp',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'email',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'password',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'target_url',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'password_plaintext',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'password_type',
+                                'type': 'string'
+                            }
+                        ],
+                        'rows': [
+                            [
+                                '()',
+                                'C:/Users/Usama/AppData/Local/Temp/6210230526.exe',
+                                '2020-03-26 16:56:49',
+                                '()',
+                                '()',
+                                'admin@example.org',
+                                'test123',
+                                'http://localhost:3000/en/session',
+                                'test123',
+                                'plaintext'
+                            ]
+                        ]
+                    },
                     'external_ids': [
                         '90f9c47d-c86d-400f-9a57-38fed22b5fad',
                         '17551',
@@ -133,29 +260,18 @@ EXPECTED_SUCCESS_RESPONSE = {
                     'observed_time': {
                         'start_time': '2020-04-16T00:00:00.000000Z'
                     },
-                    'relations': [
-                        {
-                            'origin': 'Spycloud Breach Module',
-                            'related': {
-                                'type': 'email',
-                                'value': 'admin@example.org'
-                            },
-                            'relation': 'Leaked_From',
-                            'source': {
-                                'type': 'domain',
-                                'value': 'example.org'
-                            }
-                        }
-                    ],
+                    'relations': [],
                     'schema_version': '1.0.16',
                     'severity': 'High',
                     'source': 'Spycloud',
+                    'source_uri': 'https://portal.spycloud.com/breach/catalog/'
+                                  '3a7fc3d4-2f57-4076-951c-287332a4d1f8',
                     'targets': [
                         {
                             'observables': [
                                 {
-                                    'type': 'url',
-                                    'value': 'http://localhost:3000/en/session'
+                                    'type': 'email',
+                                    'value': 'admin@example.org'
                                 }
                             ],
                             'observed_time': {
@@ -168,8 +284,56 @@ EXPECTED_SUCCESS_RESPONSE = {
                     'type': 'sighting'
                 },
                 {
-                    'confidence': 'Medium',
+                    'confidence': 'High',
                     'count': 6,
+                    'data': {
+                        'columns': [
+                            {
+                                'name': 'target_url',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'user_browser',
+                             'type': 'string'
+                            },
+                            {
+                                'name': 'country',
+                             'type': 'string'
+                            },
+                            {
+                                'name': 'ip_addresses',
+                             'type': 'string'
+                            },
+                            {
+                                'name': 'email',
+                             'type': 'string'
+                            },
+                            {
+                                'name': 'password',
+                             'type': 'string'
+                            },
+                            {
+                                'name': 'password_plaintext',
+                             'type': 'string'
+                            },
+                            {
+                                'name': 'password_type',
+                             'type': 'string'
+                            }
+                        ],
+                        'rows': [
+                            [
+                                '13.127.174.82',
+                                'Google Chrome New',
+                                'India',
+                                ['210.56.127.202'],
+                                'admin@example.org',
+                                'Admin@1234',
+                                'Admin@1234',
+                                'plaintext'
+                            ]
+                        ]
+                    },
                     'external_ids': [
                         'd27e8c1e-dd07-4237-bf51-40bcb5744fcc',
                         '17494',
@@ -185,41 +349,18 @@ EXPECTED_SUCCESS_RESPONSE = {
                     'observed_time': {
                         'start_time': '2020-04-02T00:00:00.000000Z'
                     },
-                    'relations': [
-                        {
-                            'origin': 'Spycloud Breach Module',
-                            'related': {
-                                'type': 'email',
-                                'value': 'admin@example.org'
-                            },
-                            'relation': 'Leaked_From',
-                            'source': {
-                                'type': 'domain',
-                                'value': 'example.org'
-                            }
-                        },
-                        {
-                            'origin': 'Spycloud Breach Module',
-                            'related': {
-                                'type': 'email',
-                                'value': 'admin@example.org'
-                            },
-                            'relation': 'Leaked_From',
-                            'source': {
-                                'type': 'ip',
-                                'value': '210.56.127.202'
-                            }
-                        }
-                    ],
+                    'relations': [],
                     'schema_version': '1.0.16',
                     'severity': 'High',
                     'source': 'Spycloud',
+                    'source_uri': 'https://portal.spycloud.com/breach/catalog/'
+                                  '1293a093-5b3b-42c5-aa90-d5784ea8374f',
                     'targets': [
                         {
                             'observables': [
                                 {
-                                    'type': 'ip',
-                                    'value': '13.127.174.82'
+                                    'type': 'email',
+                                    'value': 'admin@example.org'
                                 }
                             ],
                             'observed_time': {
