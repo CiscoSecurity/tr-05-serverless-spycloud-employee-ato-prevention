@@ -29,6 +29,12 @@ class Config:
         'High': (6, 25),
     }
 
+    SPYCLOUD_IGNORING_FIELDS = [
+        'sighting', 'infected_machine_id', 'email_domain', 'domain',
+        'email_username', 'document_id', 'source_id', 'spycloud_publish_date',
+        'severity'
+    ]
+
     CTR_DEFAULT_ENTITIES_LIMIT = 100
     CTR_ENTITIES_LIMIT = CTR_DEFAULT_ENTITIES_LIMIT
 

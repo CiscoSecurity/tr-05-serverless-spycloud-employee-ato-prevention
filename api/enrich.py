@@ -84,7 +84,7 @@ def get_relations(observable, catalog):
                 'type': 'domain',
                 'value': domain
             },
-            'related': observable['value'],
+            'related': observable,
             'relation': 'Leaked_From',
         }
         relations.append(relation)
@@ -93,7 +93,7 @@ def get_relations(observable, catalog):
 
 
 def get_severity(breach, catalog):
-    if not catalog['combo_list_flag']:
+    if not catalog.get('combo_list_flag'):
         severity_score = breach['severity']
         for s_name, borders in \
                 current_app.config['SPYCLOUD_SEVERITY_RELATIONS'].items():
@@ -113,6 +113,23 @@ def get_external_ids(breach):
         external_ids.append(breach['infected_machine_id'])
 
     return external_ids
+
+
+def get_data(breach):
+    data = {
+        'columns': [],
+        'rows': [[]]
+    }
+    for item in breach.items():
+        if item[0] not in current_app.config['SPYCLOUD_IGNORING_FIELDS']:
+            column = {
+                'name': item[0],
+                'type': 'string'
+            }
+            data['columns'].append(column)
+            data['rows'][0].append(item[1])
+
+    return data
 
 
 def extract_sightings(breach, output, catalogs):
@@ -156,6 +173,7 @@ def extract_sightings(breach, output, catalogs):
         'source_uri': current_app.config['SPYCLOUD_UI_URL'].format(
             uuid=catalog['uuid']
         ),
+        'data': get_data(breach),
         **current_app.config['CTIM_SIGHTING_DEFAULT']
     }
 
