@@ -233,7 +233,8 @@ EXPECTED_SUCCESS_RESPONSE = {
                         'rows': [
                             [
                                 '()',
-                                'C:/Users/Usama/AppData/Local/Temp/6210230526.exe',
+                                'C:/Users/Usama/AppData/Local/Temp'
+                                '/6210230526.exe',
                                 '2020-03-26 16:56:49',
                                 '()',
                                 '()',
@@ -294,31 +295,31 @@ EXPECTED_SUCCESS_RESPONSE = {
                             },
                             {
                                 'name': 'user_browser',
-                             'type': 'string'
+                                'type': 'string'
                             },
                             {
                                 'name': 'country',
-                             'type': 'string'
+                                'type': 'string'
                             },
                             {
                                 'name': 'ip_addresses',
-                             'type': 'string'
+                                'type': 'string'
                             },
                             {
                                 'name': 'email',
-                             'type': 'string'
+                                'type': 'string'
                             },
                             {
                                 'name': 'password',
-                             'type': 'string'
+                                'type': 'string'
                             },
                             {
                                 'name': 'password_plaintext',
-                             'type': 'string'
+                                'type': 'string'
                             },
                             {
                                 'name': 'password_type',
-                             'type': 'string'
+                                'type': 'string'
                             }
                         ],
                         'rows': [
