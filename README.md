@@ -85,6 +85,14 @@ Header:
 After encryption set your `SECRET_KEY` environment 
 variable in AWS lambda for successful decryption in Relay API.
 
+## Environment Variables
+
+- `SECRET_KEY` - string key used while `JWT` encoding. Mandatory variable.
+- `CTR_ENTITIES_LIMIT` - the maximum number of entities in a response.
+ Applicable to: `Sighting`, `Indicator`.
+ Must be a positive integer.
+ Default value - `100`, used if the variable is not set or set variable is incorrect.
+
 ## Usage
 
 ```bash
