@@ -54,11 +54,20 @@ class SpycloudForbidenError(TRError):
 
 class SpycloudUnexpectedResponseError(TRError):
     def __init__(self, payload):
-        error_payload = payload.json().get('message', [])
+        error_payload = payload.json()
 
         super().__init__(
             UNKNOWN,
             str(error_payload)
+        )
+
+
+class SpycloudTooManyRequestsError(TRError):
+    def __init__(self):
+        super().__init__(
+            TOO_MANY_REQUESTS,
+            'Too many requests have been made to '
+            'Spycloud. Please, try again later.'
         )
 
 

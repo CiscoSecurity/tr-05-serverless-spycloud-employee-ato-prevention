@@ -12,7 +12,8 @@ from api.errors import (
     SpycloudNotFoundError,
     SpycloudUnexpectedResponseError,
     SpycloudForbidenError,
-    BadRequestError
+    BadRequestError,
+    SpycloudTooManyRequestsError
 )
 
 
@@ -77,7 +78,8 @@ def get_response_data(response):
         HTTPStatus.UNAUTHORIZED: SpycloudInvalidCredentialsError,
         HTTPStatus.FORBIDDEN: SpycloudForbidenError,
         HTTPStatus.NOT_FOUND: SpycloudNotFoundError,
-        HTTPStatus.INTERNAL_SERVER_ERROR: SpycloudInternalServerError
+        HTTPStatus.INTERNAL_SERVER_ERROR: SpycloudInternalServerError,
+        HTTPStatus.TOO_MANY_REQUESTS: SpycloudTooManyRequestsError
     }
 
     if response.ok:
@@ -86,5 +88,7 @@ def get_response_data(response):
     else:
         if response.status_code in expected_response_errors:
             raise expected_response_errors[response.status_code]
+        elif response.status_code == HTTPStatus.BAD_REQUEST:
+            return {}
         else:
             raise SpycloudUnexpectedResponseError(response)
