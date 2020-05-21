@@ -33,9 +33,6 @@ def spycloud_api_request():
 def spycloud_api_response(*, ok, status_error=None, payload=None):
     mock_response = mock.MagicMock()
 
-    if payload:
-        payload = payload
-
     mock_response.ok = ok
 
     if ok:
