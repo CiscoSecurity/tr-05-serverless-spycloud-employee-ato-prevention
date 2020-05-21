@@ -63,3 +63,9 @@ class Config:
     }
 
     CTIM_DEFAULT_SIGHTING_TITLE = 'Present in {title}'
+
+    CTIM_INDICATOR_DEFAULT = {
+        'type': 'indicator',
+        'schema_version': CTIM_SCHEMA_VERSION,
+        'producer': SPYCLOUD_SOURCE_NAME,
+    }

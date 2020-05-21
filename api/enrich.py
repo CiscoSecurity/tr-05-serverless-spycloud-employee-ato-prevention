@@ -139,6 +139,14 @@ def get_external_references(result):
             'description': result['site_description'],
             'url': result['site']
         })
+    if result.get('uuid') and result.get('description'):
+        external_references.append({
+            "source_name": "SpyCloud",
+            "description": result['description'],
+            "url": current_app.config['SPYCLOUD_UI_URL'].format(
+                uuid=result['uuid']),
+            "external_id": result['uuid']
+        })
     return external_references
 
 
@@ -272,6 +280,8 @@ def observe_observables():
 
     if sightings:
         relay_output['sightings'] = format_docs(sightings)
+    if indicators:
+        relay_output['indicators'] = format_docs(indicators)
 
     return jsonify_data(relay_output)
 
