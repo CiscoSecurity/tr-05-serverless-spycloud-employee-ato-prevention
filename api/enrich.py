@@ -131,6 +131,33 @@ def get_data(breach):
     return data
 
 
+def get_external_references(result):
+    external_references = []
+    if result.get('site_description') and result.get('site'):
+        external_references.append({
+            'source_name': 'Spycloud',
+            'description': result['site_description'],
+            'url': result['site']
+        })
+    if result.get('uuid') and result.get('description'):
+        external_references.append({
+            "source_name": "SpyCloud",
+            "description": result['description'],
+            "url": current_app.config['SPYCLOUD_UI_URL'].format(
+                uuid=result['uuid']),
+            "external_id": result['uuid']
+        })
+    return external_references
+
+
+def get_confidence(result):
+    score = result['confidence']
+    if score:
+        return current_app.config['SPYCLOUD_CONFIDENCE_RELATIONS'][score]
+    else:
+        return 'Low'
+
+
 def extract_sightings(breach, output, catalogs):
 
     catalog = catalogs[breach['source_id']]
@@ -179,6 +206,34 @@ def extract_sightings(breach, output, catalogs):
     return doc
 
 
+def extract_indicators(catalog):
+    start_time = datetime.strptime(
+        catalog['spycloud_publish_date'], '%Y-%m-%dT%H:%M:%SZ'
+    )
+
+    valid_time = {
+        'start_time': start_time.isoformat(
+            timespec='microseconds') + 'Z',
+    }
+
+    indicator_id = f'transient:{uuid4()}'
+
+    doc = {
+        'id': indicator_id,
+        'valid_time': valid_time,
+        'confidence': get_confidence(catalog),
+        'title': catalog['title'],
+        'description': catalog['description'],
+        'short_description': catalog['title'],
+        'external_ids': [str(catalog['id']), catalog['uuid']],
+        'external_references': get_external_references(catalog),
+        'tags': list(catalog['assets'].keys()) or [],
+        **current_app.config['CTIM_INDICATOR_DEFAULT']
+    }
+
+    return doc
+
+
 def format_docs(docs):
     return {'count': len(docs), 'docs': docs}
 
@@ -205,6 +260,7 @@ def observe_observables():
         return jsonify_data({})
 
     sightings = []
+    indicators = []
 
     for output in spycloud_breach_outputs:
 
@@ -217,11 +273,15 @@ def observe_observables():
         for breach in breaches:
             sightings.append(
                 extract_sightings(breach, output, spycloud_catalogs))
+        for id in spycloud_catalogs:
+            indicators.append(extract_indicators(spycloud_catalogs[id]))
 
     relay_output = {}
 
     if sightings:
         relay_output['sightings'] = format_docs(sightings)
+    if indicators:
+        relay_output['indicators'] = format_docs(indicators)
 
     return jsonify_data(relay_output)
 

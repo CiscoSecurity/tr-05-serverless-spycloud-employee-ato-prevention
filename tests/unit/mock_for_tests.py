@@ -181,6 +181,82 @@ EXPECTED_RESPONSE_500_ERROR = {
 
 EXPECTED_SUCCESS_RESPONSE = {
     'data': {
+        'indicators': {
+            'count': 2,
+            'docs': [
+                {
+                    'confidence': 'Low',
+                    'description': 'test description for 17551',
+                    'external_ids': [
+                        '17551', '3a7fc3d4-2f57-4076-951c-287332a4d1f8'
+                    ],
+                    'external_references': [
+                        {
+                            'description': 'test site description for 17551',
+                            'source_name': 'Spycloud',
+                            'url': 'n/a'
+                        },
+                        {
+                            'description': 'test description for 17551',
+                            'external_id':
+                                '3a7fc3d4-2f57-4076-951c-287332a4d1f8',
+                            'source_name': 'SpyCloud',
+                            'url': 'https://portal.spycloud.com/breach/catalog'
+                                   '/3a7fc3d4-2f57-4076-951c-287332a4d1f8'
+                        }
+                    ],
+                    'producer': 'Spycloud',
+                    'schema_version': '1.0.16',
+                    'short_description': 'Vidar Stealer',
+                    'tags': [
+                        'username', 'city', 'target_url', 'infected_time',
+                        'user_browser', 'country', 'ip_addresses', 'isp',
+                        'infected_path', 'postal_code', 'password', 'email',
+                        'infected_machine_id'
+                    ],
+                    'title': 'Vidar Stealer',
+                    'type': 'indicator',
+                    'valid_time': {
+                        'start_time': '2020-04-16T00:00:00.000000Z'
+                    }
+                },
+                {
+                    'confidence': 'Low',
+                    'description': 'test description for 17494',
+                    'external_ids': [
+                        '17494', '1293a093-5b3b-42c5-aa90-d5784ea8374f'
+                    ],
+                    'external_references': [
+                        {
+                            'description': 'test site description for 17494',
+                            'source_name': 'Spycloud',
+                            'url': 'n/a'
+                        },
+                        {
+                            'description': 'test description for 17494',
+                            'external_id':
+                                '1293a093-5b3b-42c5-aa90-d5784ea8374f',
+                            'source_name': 'SpyCloud',
+                            'url': 'https://portal.spycloud.com/breach/catalog'
+                                   '/1293a093-5b3b-42c5-aa90-d5784ea8374f'
+                        }
+                    ],
+                    'producer': 'Spycloud',
+                    'schema_version': '1.0.16',
+                    'short_description': 'Russian Password Stealer',
+                    'tags': [
+                        'username', 'city', 'target_url',
+                        'infected_machine_id', 'user_browser', 'country',
+                        'ip_addresses', 'infected_path', 'password', 'email'
+                    ],
+                    'title': 'Russian Password Stealer',
+                    'type': 'indicator',
+                    'valid_time': {
+                        'start_time': '2020-04-02T00:00:00.000000Z'
+                    }
+                }
+            ]
+        },
         'sightings': {
             'count': 2,
             'docs': [

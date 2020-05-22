@@ -98,6 +98,9 @@ def test_enrich_call_success(route, client, valid_jwt, valid_json,
     assert data['data']['sightings']['docs'][0].pop('id')
     assert data['data']['sightings']['docs'][1].pop('id')
 
+    assert data['data']['indicators']['docs'][0].pop('id')
+    assert data['data']['indicators']['docs'][1].pop('id')
+
     assert data == EXPECTED_SUCCESS_RESPONSE
 
 
