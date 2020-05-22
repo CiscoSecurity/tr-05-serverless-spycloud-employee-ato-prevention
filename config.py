@@ -29,6 +29,12 @@ class Config:
         'High': (6, 25),
     }
 
+    SPYCLOUD_CONFIDENCE_RELATIONS = {
+        1: 'High',
+        2: 'Medium',
+        3: 'Low'
+    }
+
     SPYCLOUD_IGNORING_FIELDS = [
         'sighting', 'infected_machine_id', 'email_domain', 'domain',
         'email_username', 'document_id', 'source_id', 'spycloud_publish_date',
@@ -57,3 +63,9 @@ class Config:
     }
 
     CTIM_DEFAULT_SIGHTING_TITLE = 'Present in {title}'
+
+    CTIM_INDICATOR_DEFAULT = {
+        'type': 'indicator',
+        'schema_version': CTIM_SCHEMA_VERSION,
+        'producer': SPYCLOUD_SOURCE_NAME,
+    }
