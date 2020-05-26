@@ -273,8 +273,8 @@ def observe_observables():
         for breach in breaches:
             sightings.append(
                 extract_sightings(breach, output, spycloud_catalogs))
-        for id in spycloud_catalogs:
-            indicators.append(extract_indicators(spycloud_catalogs[id]))
+            indicators.append(extract_indicators(
+                spycloud_catalogs[breach['source_id']]))
 
     relay_output = {}
 
