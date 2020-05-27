@@ -79,11 +79,11 @@ def get_relations(observable, catalog):
         domain = catalog['site']
         relation = {
             'origin': 'Spycloud Breach Module',
-            'source': {
+            'source': observable,
+            'related': {
                 'type': 'domain',
                 'value': domain
             },
-            'related': observable,
             'relation': 'Leaked_From',
         }
         relations.append(relation)
