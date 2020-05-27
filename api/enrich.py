@@ -38,33 +38,31 @@ def group_observables(relay_input):
     return result
 
 
-def validate_spycloud_outputs(observables):
+def validate_spycloud_outputs(observable, key):
 
     breaches = []
     catalogs = {}
-    for observable in observables:
 
-        headers = {
-            **current_app.config['SPYCLOUD_BASE_HEADERS'],
-            'X-API-Key': get_jwt().get('key', '')
-        }
+    headers = {
+        **current_app.config['SPYCLOUD_BASE_HEADERS'],
+        'X-API-Key': key
+    }
 
-        url = url_for(f'breach/data/emails/{observable["value"]}')
+    url = url_for(f'breach/data/emails/{observable["value"]}')
 
-        spycloud_breach_output = get_spycloud_breach_outputs(url, headers)
+    spycloud_breach_output = get_spycloud_breach_outputs(url, headers)
 
-        if spycloud_breach_output:
-            spycloud_breach_output['observable'] = observable
-            breaches.append(spycloud_breach_output)
+    if spycloud_breach_output:
+        spycloud_breach_output['observable'] = observable
+        breaches.append(spycloud_breach_output)
 
-            for result in spycloud_breach_output['results']:
+        for result in spycloud_breach_output['results']:
+            url = url_for(f'breach/catalog/{result["source_id"]}')
 
-                url = url_for(f'breach/catalog/{result["source_id"]}')
-
-                spycloud_breach_catalog = get_spycloud_breach_outputs(
-                    url, headers)
-                catalog = spycloud_breach_catalog['results'][0]
-                catalogs.update({catalog['id']: catalog})
+            spycloud_breach_catalog = get_spycloud_breach_outputs(
+                url, headers)
+            catalog = spycloud_breach_catalog['results'][0]
+            catalogs.update({catalog['id']: catalog})
 
     return breaches, catalogs
 
@@ -250,34 +248,35 @@ def observe_observables():
     if not observables:
         return jsonify_data({})
 
-    spycloud_breach_outputs, spycloud_catalogs = validate_spycloud_outputs(
-        observables)
-
-    if not spycloud_breach_outputs and spycloud_catalogs:
-        return jsonify_data({})
+    token = get_jwt().get('key', '')
 
     g.sightings = []
     g.indicators = []
 
-    for output in spycloud_breach_outputs:
+    for observable in observables:
+        spycloud_breach_outputs, spycloud_catalogs = validate_spycloud_outputs(
+            observable, token)
 
-        breaches = output['results']
-        breaches.sort(key=lambda x: x['spycloud_publish_date'], reverse=True)
+        for output in spycloud_breach_outputs:
 
-        unique_catalog_id_set = set()
+            breaches = output['results']
+            breaches.sort(
+                key=lambda x: x['spycloud_publish_date'], reverse=True)
 
-        if len(breaches) >= current_app.config['CTR_ENTITIES_LIMIT']:
-            breaches = breaches[:current_app.config['CTR_ENTITIES_LIMIT']]
+            unique_catalog_id_set = set()
 
-        for breach in breaches:
-            g.sightings.append(
-                extract_sightings(breach, output, spycloud_catalogs))
+            if len(breaches) >= current_app.config['CTR_ENTITIES_LIMIT']:
+                breaches = breaches[:current_app.config['CTR_ENTITIES_LIMIT']]
 
-            catalog_id = breach['source_id']
-            if catalog_id not in unique_catalog_id_set:
-                g.indicators.append(
-                    extract_indicators(spycloud_catalogs[catalog_id]))
-                unique_catalog_id_set.add(catalog_id)
+            for breach in breaches:
+                g.sightings.append(
+                    extract_sightings(breach, output, spycloud_catalogs))
+
+                catalog_id = breach['source_id']
+                if catalog_id not in unique_catalog_id_set:
+                    g.indicators.append(
+                        extract_indicators(spycloud_catalogs[catalog_id]))
+                    unique_catalog_id_set.add(catalog_id)
 
     relay_output = {}
 
