@@ -31,9 +31,19 @@ def test_positive_sighting_email_observable(module_headers):
         {'name': 'isp', 'type': 'string'},
         {'name': 'email', 'type': 'string'},
         {'name': 'password', 'type': 'string'},
-        {'name': 'target_url', 'type': 'string'},
         {'name': 'password_plaintext', 'type': 'string'},
-        {'name': 'password_type', 'type': 'string'}
+        {'name': 'password_type', 'type': 'string'},
+        {'name': 'gender', 'type': 'string'},
+        {'name': 'target_url', 'type': 'string'},
+        {'name': 'source_file', 'type': 'string'},
+        {'name': 'record_modification_date', 'type': 'string'},
+        {'name': 'salt', 'type': 'string'},
+        {'name': 'user_browser', 'type': 'string'},
+        {'name': 'target_domain', 'type': 'string'},
+        {'name': 'account_signup_time', 'type': 'string'},
+        {'name': 'account_login_time', 'type': 'string'},
+        {'name': 'ip_addresses', 'type': 'string'},
+        {'name': 'username', 'type': 'string'}
     ]
     assert len(sightings['docs']) > 0
 
@@ -44,19 +54,32 @@ def test_positive_sighting_email_observable(module_headers):
         assert sighting['source'] == 'Spycloud'
         assert 'https://portal.spycloud.com/breach/catalog/' in sighting[
             'source_uri']
-        assert sighting['severity'] == 'High'
-        assert sighting['confidence'] == 'High'
+        assert sighting['severity'] in ['Low', 'Medium', 'High']
+        assert sighting['confidence'] in ['Low', 'Medium', 'High']
         assert sighting['title'] == 'Reported to Spycloud'
         assert sighting['count'] > 0
         assert len(sighting['external_ids']) > 0
         assert sighting['internal'] is False
         assert sighting['observables'][0] == payload
-        assert 'relations' in sighting
+
+        if sighting['relations']:
+            relation = sighting['relations'][0]
+            assert relation['origin'] == 'Spycloud Breach Module'
+            assert relation['relation'] == 'Leaked_From'
+            assert relation['source'] == {
+                'value': 'admin@example.org', 'type': 'email'}
+            assert relation['related']['type']
+            assert relation['related']['value']
+
         for target in sighting['targets']:
             assert target['type'] == 'email'
             assert target['observables'][0] == payload
             assert 'start_time' in target['observed_time']
-        assert columns_structure == sighting['data']['columns']
+
+        assert [
+            i for i in sighting['data']['columns']
+            if i not in columns_structure
+        ] == []
         assert 'rows' in sighting['data']
 
     assert sightings['count'] == len(sightings['docs'])
