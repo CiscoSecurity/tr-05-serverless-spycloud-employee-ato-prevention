@@ -135,13 +135,13 @@ def get_external_references(result):
     external_references = []
     if result.get('site_description') and result.get('site'):
         external_references.append({
-            'source_name': 'Spycloud',
+            'source_name': current_app.config['SPYCLOUD_SOURCE_NAME'],
             'description': result['site_description'],
             'url': result['site']
         })
     if result.get('uuid') and result.get('description'):
         external_references.append({
-            "source_name": "SpyCloud",
+            "source_name": current_app.config['SPYCLOUD_SOURCE_NAME'],
             "description": result['description'],
             "url": current_app.config['SPYCLOUD_UI_URL'].format(
                 uuid=result['uuid']),
