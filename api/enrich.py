@@ -267,7 +267,7 @@ def observe_observables():
         breaches = output['results']
         breaches.sort(key=lambda x: x['spycloud_publish_date'], reverse=True)
 
-        uniq_catalog_id_list = []
+        uniq_catalog_id_list = set()
 
         if len(breaches) >= current_app.config['CTR_ENTITIES_LIMIT']:
             breaches = breaches[:current_app.config['CTR_ENTITIES_LIMIT']]
@@ -280,7 +280,7 @@ def observe_observables():
             if catalog_id not in uniq_catalog_id_list:
                 indicators.append(
                     extract_indicators(spycloud_catalogs[catalog_id]))
-                uniq_catalog_id_list.append(catalog_id)
+                uniq_catalog_id_list.add(catalog_id)
 
     relay_output = {}
 
