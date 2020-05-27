@@ -3,7 +3,7 @@ from functools import partial
 from datetime import datetime
 
 import requests
-from flask import Blueprint, current_app
+from flask import Blueprint, current_app, g
 
 from api.schemas import ObservableSchema
 from api.utils import (
@@ -11,7 +11,8 @@ from api.utils import (
     get_jwt,
     jsonify_data,
     url_for,
-    get_response_data
+    get_response_data,
+    format_docs
 )
 
 enrich_api = Blueprint('enrich', __name__)
@@ -234,10 +235,6 @@ def extract_indicators(catalog):
     return doc
 
 
-def format_docs(docs):
-    return {'count': len(docs), 'docs': docs}
-
-
 @enrich_api.route('/deliberate/observables', methods=['POST'])
 def deliberate_observables():
     # Not implemented
@@ -261,6 +258,10 @@ def observe_observables():
 
     sightings = []
     indicators = []
+    g.data = {
+        'sightings': [],
+        'indicators': []
+    }
 
     for output in spycloud_breach_outputs:
 
@@ -273,21 +274,21 @@ def observe_observables():
             breaches = breaches[:current_app.config['CTR_ENTITIES_LIMIT']]
 
         for breach in breaches:
-            sightings.append(
+            g.data['sightings'].append(
                 extract_sightings(breach, output, spycloud_catalogs))
 
             catalog_id = breach['source_id']
             if catalog_id not in unique_catalog_id_set:
-                indicators.append(
+                g.data['indicators'].append(
                     extract_indicators(spycloud_catalogs[catalog_id]))
                 unique_catalog_id_set.add(catalog_id)
 
     relay_output = {}
 
-    if sightings:
-        relay_output['sightings'] = format_docs(sightings)
-    if indicators:
-        relay_output['indicators'] = format_docs(indicators)
+    if g.data['sightings']:
+        relay_output['sightings'] = format_docs(g.data['sightings'])
+    if g.data['indicators']:
+        relay_output['indicators'] = format_docs(g.data['indicators'])
 
     return jsonify_data(relay_output)
 

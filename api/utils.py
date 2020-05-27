@@ -4,7 +4,7 @@ from http import HTTPStatus
 
 from authlib.jose import jwt
 from authlib.jose.errors import JoseError
-from flask import request, current_app, jsonify
+from flask import request, current_app, jsonify, g
 
 from api.errors import (
     SpycloudInternalServerError,
@@ -68,8 +68,25 @@ def jsonify_data(data):
     return jsonify({'data': data})
 
 
+def format_docs(docs):
+    return {'count': len(docs), 'docs': docs}
+
+
 def jsonify_errors(error):
-    return jsonify({'errors': [error]})
+    data = {
+        'errors': [error],
+        'data': {}
+    }
+
+    if g.get('sightings') and g.sightings:
+        data['data'].update({'sightings': format_docs(g.sightings)})
+
+    if g.get('indicators') and g.indicators:
+        data['data'].update({'indicators': format_docs(g.indicators)})
+
+    if not data['data']:
+        data.pop('data')
+    return jsonify(data)
 
 
 def get_response_data(response):
