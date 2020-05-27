@@ -200,7 +200,7 @@ EXPECTED_SUCCESS_RESPONSE = {
                             'description': 'test description for 17551',
                             'external_id':
                                 '3a7fc3d4-2f57-4076-951c-287332a4d1f8',
-                            'source_name': 'SpyCloud',
+                            'source_name': 'Spycloud',
                             'url': 'https://portal.spycloud.com/breach/catalog'
                                    '/3a7fc3d4-2f57-4076-951c-287332a4d1f8'
                         }
@@ -236,7 +236,7 @@ EXPECTED_SUCCESS_RESPONSE = {
                             'description': 'test description for 17494',
                             'external_id':
                                 '1293a093-5b3b-42c5-aa90-d5784ea8374f',
-                            'source_name': 'SpyCloud',
+                            'source_name': 'Spycloud',
                             'url': 'https://portal.spycloud.com/breach/catalog'
                                    '/1293a093-5b3b-42c5-aa90-d5784ea8374f'
                         }
