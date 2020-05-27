@@ -2,9 +2,17 @@ dist: xenial
 language: python
 python:
 - '3.7'
+before_install:
+- openssl aes-256-cbc -k "$travis_key_password" -d -md sha256 -a -in travis_key.enc -out ~/.ssh/id_rsa
+- chmod 400 ~/.ssh/id_rsa
 install:
 - pip install -U -r requirements.txt
 - pip install -U -r test-requirements.txt
+before_script:
+- cp ~/build/CiscoSecurity/tr-05-serverless-spycloud-employee-ato-prevention/tests/functional/project.properties.sample ~/build/CiscoSecurity/project.properties
+- sed -i "s|ctr_client_id=.*|ctr_client_id=$ctr_client_id|" ~/build/CiscoSecurity/project.properties
+- sed -i "s|ctr_client_password=.*|ctr_client_password=$ctr_client_password|" ~/build/CiscoSecurity/project.properties
 script:
 - flake8 .
 - pytest -v tests/unit/
+- pytest -v tests/functional
