@@ -256,12 +256,8 @@ def observe_observables():
     if not spycloud_breach_outputs and spycloud_catalogs:
         return jsonify_data({})
 
-    sightings = []
-    indicators = []
-    g.data = {
-        'sightings': [],
-        'indicators': []
-    }
+    g.sightings = []
+    g.indicators = []
 
     for output in spycloud_breach_outputs:
 
@@ -274,21 +270,21 @@ def observe_observables():
             breaches = breaches[:current_app.config['CTR_ENTITIES_LIMIT']]
 
         for breach in breaches:
-            g.data['sightings'].append(
+            g.sightings.append(
                 extract_sightings(breach, output, spycloud_catalogs))
 
             catalog_id = breach['source_id']
             if catalog_id not in unique_catalog_id_set:
-                g.data['indicators'].append(
+                g.indicators.append(
                     extract_indicators(spycloud_catalogs[catalog_id]))
                 unique_catalog_id_set.add(catalog_id)
 
     relay_output = {}
 
-    if g.data['sightings']:
-        relay_output['sightings'] = format_docs(g.data['sightings'])
-    if g.data['indicators']:
-        relay_output['indicators'] = format_docs(g.data['indicators'])
+    if g.sightings:
+        relay_output['sightings'] = format_docs(g.sightings)
+    if g.indicators:
+        relay_output['indicators'] = format_docs(g.indicators)
 
     return jsonify_data(relay_output)
 
