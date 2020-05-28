@@ -40,7 +40,6 @@ def group_observables(relay_input):
 
 def validate_spycloud_outputs(observable, key):
 
-    breaches = []
     catalogs = {}
 
     headers = {
@@ -54,7 +53,6 @@ def validate_spycloud_outputs(observable, key):
 
     if spycloud_breach_output:
         spycloud_breach_output['observable'] = observable
-        breaches.append(spycloud_breach_output)
 
         for result in spycloud_breach_output['results']:
             url = url_for(f'breach/catalog/{result["source_id"]}')
@@ -64,7 +62,7 @@ def validate_spycloud_outputs(observable, key):
             catalog = spycloud_breach_catalog['results'][0]
             catalogs.update({catalog['id']: catalog})
 
-    return breaches, catalogs
+    return spycloud_breach_output, catalogs
 
 
 def get_spycloud_breach_outputs(url, headers):
@@ -254,29 +252,27 @@ def observe_observables():
     g.indicators = []
 
     for observable in observables:
-        spycloud_breach_outputs, spycloud_catalogs = validate_spycloud_outputs(
+        output, spycloud_catalogs = validate_spycloud_outputs(
             observable, token)
 
-        for output in spycloud_breach_outputs:
+        breaches = output['results']
+        breaches.sort(
+            key=lambda x: x['spycloud_publish_date'], reverse=True)
 
-            breaches = output['results']
-            breaches.sort(
-                key=lambda x: x['spycloud_publish_date'], reverse=True)
+        unique_catalog_id_set = set()
 
-            unique_catalog_id_set = set()
+        if len(breaches) >= current_app.config['CTR_ENTITIES_LIMIT']:
+            breaches = breaches[:current_app.config['CTR_ENTITIES_LIMIT']]
 
-            if len(breaches) >= current_app.config['CTR_ENTITIES_LIMIT']:
-                breaches = breaches[:current_app.config['CTR_ENTITIES_LIMIT']]
+        for breach in breaches:
+            g.sightings.append(
+                extract_sightings(breach, output, spycloud_catalogs))
 
-            for breach in breaches:
-                g.sightings.append(
-                    extract_sightings(breach, output, spycloud_catalogs))
-
-                catalog_id = breach['source_id']
-                if catalog_id not in unique_catalog_id_set:
-                    g.indicators.append(
-                        extract_indicators(spycloud_catalogs[catalog_id]))
-                    unique_catalog_id_set.add(catalog_id)
+            catalog_id = breach['source_id']
+            if catalog_id not in unique_catalog_id_set:
+                g.indicators.append(
+                    extract_indicators(spycloud_catalogs[catalog_id]))
+                unique_catalog_id_set.add(catalog_id)
 
     relay_output = {}
 
