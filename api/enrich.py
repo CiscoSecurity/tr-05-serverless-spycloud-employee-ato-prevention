@@ -3,7 +3,7 @@ from functools import partial
 from datetime import datetime
 
 import requests
-from flask import Blueprint, current_app
+from flask import Blueprint, current_app, g
 
 from api.schemas import ObservableSchema
 from api.utils import (
@@ -11,7 +11,8 @@ from api.utils import (
     get_jwt,
     jsonify_data,
     url_for,
-    get_response_data
+    get_response_data,
+    format_docs
 )
 
 enrich_api = Blueprint('enrich', __name__)
@@ -37,35 +38,31 @@ def group_observables(relay_input):
     return result
 
 
-def validate_spycloud_outputs(observables):
+def validate_spycloud_outputs(observable, key):
 
-    breaches = []
     catalogs = {}
-    for observable in observables:
 
-        headers = {
-            **current_app.config['SPYCLOUD_BASE_HEADERS'],
-            'X-API-Key': get_jwt().get('key', '')
-        }
+    headers = {
+        **current_app.config['SPYCLOUD_BASE_HEADERS'],
+        'X-API-Key': key
+    }
 
-        url = url_for(f'breach/data/emails/{observable["value"]}')
+    url = url_for(f'breach/data/emails/{observable["value"]}')
 
-        spycloud_breach_output = get_spycloud_breach_outputs(url, headers)
+    spycloud_breach_output = get_spycloud_breach_outputs(url, headers)
 
-        if spycloud_breach_output:
-            spycloud_breach_output['observable'] = observable
-            breaches.append(spycloud_breach_output)
+    if spycloud_breach_output:
+        spycloud_breach_output['observable'] = observable
 
-            for result in spycloud_breach_output['results']:
+        for result in spycloud_breach_output['results']:
+            url = url_for(f'breach/catalog/{result["source_id"]}')
 
-                url = url_for(f'breach/catalog/{result["source_id"]}')
+            spycloud_breach_catalog = get_spycloud_breach_outputs(
+                url, headers)
+            catalog = spycloud_breach_catalog['results'][0]
+            catalogs.update({catalog['id']: catalog})
 
-                spycloud_breach_catalog = get_spycloud_breach_outputs(
-                    url, headers)
-                catalog = spycloud_breach_catalog['results'][0]
-                catalogs.update({catalog['id']: catalog})
-
-    return breaches, catalogs
+    return spycloud_breach_output, catalogs
 
 
 def get_spycloud_breach_outputs(url, headers):
@@ -234,10 +231,6 @@ def extract_indicators(catalog):
     return doc
 
 
-def format_docs(docs):
-    return {'count': len(docs), 'docs': docs}
-
-
 @enrich_api.route('/deliberate/observables', methods=['POST'])
 def deliberate_observables():
     # Not implemented
@@ -253,19 +246,18 @@ def observe_observables():
     if not observables:
         return jsonify_data({})
 
-    spycloud_breach_outputs, spycloud_catalogs = validate_spycloud_outputs(
-        observables)
+    token = get_jwt().get('key', '')
 
-    if not spycloud_breach_outputs and spycloud_catalogs:
-        return jsonify_data({})
+    g.sightings = []
+    g.indicators = []
 
-    sightings = []
-    indicators = []
-
-    for output in spycloud_breach_outputs:
+    for observable in observables:
+        output, spycloud_catalogs = validate_spycloud_outputs(
+            observable, token)
 
         breaches = output['results']
-        breaches.sort(key=lambda x: x['spycloud_publish_date'], reverse=True)
+        breaches.sort(
+            key=lambda x: x['spycloud_publish_date'], reverse=True)
 
         unique_catalog_id_set = set()
 
@@ -273,21 +265,21 @@ def observe_observables():
             breaches = breaches[:current_app.config['CTR_ENTITIES_LIMIT']]
 
         for breach in breaches:
-            sightings.append(
+            g.sightings.append(
                 extract_sightings(breach, output, spycloud_catalogs))
 
             catalog_id = breach['source_id']
             if catalog_id not in unique_catalog_id_set:
-                indicators.append(
+                g.indicators.append(
                     extract_indicators(spycloud_catalogs[catalog_id]))
                 unique_catalog_id_set.add(catalog_id)
 
     relay_output = {}
 
-    if sightings:
-        relay_output['sightings'] = format_docs(sightings)
-    if indicators:
-        relay_output['indicators'] = format_docs(indicators)
+    if g.sightings:
+        relay_output['sightings'] = format_docs(g.sightings)
+    if g.indicators:
+        relay_output['indicators'] = format_docs(g.indicators)
 
     return jsonify_data(relay_output)
 

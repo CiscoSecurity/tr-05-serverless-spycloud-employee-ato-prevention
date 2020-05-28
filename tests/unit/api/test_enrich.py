@@ -78,6 +78,14 @@ def valid_json():
     return [{'type': 'email', 'value': 'admin@example.org'}]
 
 
+@fixture(scope='module')
+def valid_json_multiple():
+    return [
+        {'type': 'email', 'value': 'admin@example.org'},
+        {'type': 'email', 'value': 'second@example.org'},
+    ]
+
+
 def test_enrich_call_success(route, client, valid_jwt, valid_json,
                              spycloud_api_request):
 
@@ -146,3 +154,31 @@ def test_enrich_call_500(route, client, valid_jwt, valid_json,
     )
     assert response.status_code == HTTPStatus.OK
     assert response.get_json() == EXPECTED_RESPONSE_500_ERROR
+
+
+def test_enrich_error_with_data(route, client, valid_jwt, valid_json_multiple,
+                                spycloud_api_request):
+    spycloud_api_request.side_effect = (
+        spycloud_api_response(ok=True),
+        spycloud_api_response(ok=True, payload=CATALOG_17551_RESPONSE_MOCK),
+        spycloud_api_response(ok=True, payload=CATALOG_17494_RESPONSE_MOCK),
+        spycloud_api_response(ok=False, status_error=401)
+    )
+    response = client.post(
+        route, headers=headers(valid_jwt), json=valid_json_multiple
+    )
+    assert response.status_code == HTTPStatus.OK
+
+    data = response.get_json()
+
+    assert data['data']['sightings']['docs'][0].pop('id')
+    assert data['data']['sightings']['docs'][1].pop('id')
+
+    assert data['data']['indicators']['docs'][0].pop('id')
+    assert data['data']['indicators']['docs'][1].pop('id')
+
+    expected_response = {}
+    expected_response.update(EXPECTED_SUCCESS_RESPONSE)
+    expected_response.update(EXPECTED_RESPONSE_401_ERROR)
+
+    assert data == expected_response
