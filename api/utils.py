@@ -78,10 +78,10 @@ def jsonify_errors(error):
         'data': {}
     }
 
-    if g.get('sightings') and g.sightings:
+    if g.get('sightings'):
         data['data'].update({'sightings': format_docs(g.sightings)})
 
-    if g.get('indicators') and g.indicators:
+    if g.get('indicators'):
         data['data'].update({'indicators': format_docs(g.indicators)})
 
     if not data['data']:
