@@ -713,5 +713,11 @@ EXPECTED_SUCCESS_RESPONSE_WITHOUT_1_CATALOG = {
             ]
         }
     },
-    'errors': ['SpyCloud did not return results for 17494']
+    'errors': [
+        {
+            'code': 'not found',
+            'message': 'SpyCloud did not return results for 17494',
+            'type': 'warning'
+        }
+    ]
 }
