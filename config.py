@@ -10,8 +10,7 @@ class Config:
 
     SPYCLOUD_SOURCE_NAME = 'Spycloud'
 
-    # SPYCLOUD_API_URL = 'https://api.spycloud.io/enterprise-v2/{endpoint}'
-    SPYCLOUD_API_URL = 'https://test-heroku-tes.herokuapp.com/spycloud/{endpoint}'
+    SPYCLOUD_API_URL = 'https://api.spycloud.io/enterprise-v2/{endpoint}'
     SPYCLOUD_UI_URL = 'https://portal.spycloud.com/breach/catalog/{uuid}'
 
     SPYCLOUD_BASE_HEADERS = {
