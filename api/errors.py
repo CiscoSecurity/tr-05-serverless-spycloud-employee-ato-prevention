@@ -76,7 +76,7 @@ class SpycloudCatalogError(TRError):
         super().__init__(
             NOT_FOUND,
             message,
-            'Warning'
+            'warning'
         )
 
 
