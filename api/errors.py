@@ -71,6 +71,15 @@ class SpycloudTooManyRequestsError(TRError):
         )
 
 
+class SpycloudCatalogError(TRError):
+    def __init__(self, message):
+        super().__init__(
+            NOT_FOUND,
+            message,
+            'Warning'
+        )
+
+
 class BadRequestError(TRError):
     def __init__(self, error_message):
         super().__init__(

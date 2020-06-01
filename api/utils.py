@@ -13,7 +13,8 @@ from api.errors import (
     SpycloudUnexpectedResponseError,
     SpycloudForbidenError,
     BadRequestError,
-    SpycloudTooManyRequestsError
+    SpycloudTooManyRequestsError,
+    SpycloudCatalogError
 )
 
 
@@ -77,6 +78,10 @@ def jsonify_data(data, errors=None):
 
 def format_docs(docs):
     return {'count': len(docs), 'docs': docs}
+
+
+def get_catalog_error(error_message):
+    return SpycloudCatalogError(error_message).json
 
 
 def jsonify_errors(error):

@@ -12,7 +12,8 @@ from api.utils import (
     jsonify_data,
     url_for,
     get_response_data,
-    format_docs
+    format_docs,
+    get_catalog_error
 )
 
 enrich_api = Blueprint('enrich', __name__)
@@ -286,7 +287,7 @@ def observe_observables():
                     error_message = \
                         current_app.config['CATALOG_ERROR_TEMPLATE'].format(
                             catalog_id=catalog_id)
-                    g.errors.append(error_message)
+                    g.errors.append(get_catalog_error(error_message))
 
     relay_output = {}
 
