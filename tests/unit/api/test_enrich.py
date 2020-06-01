@@ -11,7 +11,9 @@ from tests.unit.mock_for_tests import (
     EXPECTED_RESPONSE_500_ERROR,
     EXPECTED_RESPONSE_404_ERROR,
     CATALOG_17494_RESPONSE_MOCK,
-    CATALOG_17551_RESPONSE_MOCK
+    CATALOG_17551_RESPONSE_MOCK,
+    CATALOG_PASS_RESPONSE_MOCK,
+    EXPECTED_SUCCESS_RESPONSE_WITHOUT_1_CATALOG
 )
 
 
@@ -110,6 +112,32 @@ def test_enrich_call_success(route, client, valid_jwt, valid_json,
     assert data['data']['indicators']['docs'][1].pop('id')
 
     assert data == EXPECTED_SUCCESS_RESPONSE
+
+
+def test_enrich_call_success_without_catalog(route, client, valid_jwt,
+                                             valid_json, spycloud_api_request):
+
+    spycloud_api_request.side_effect = (
+        spycloud_api_response(ok=True),
+        spycloud_api_response(ok=True, payload=CATALOG_17551_RESPONSE_MOCK),
+        spycloud_api_response(ok=True, payload=CATALOG_PASS_RESPONSE_MOCK),
+    )
+
+    response = client.post(
+        route, headers=headers(valid_jwt), json=valid_json
+    )
+
+    assert response.status_code == HTTPStatus.OK
+
+    data = response.get_json()
+
+    assert data['data']['sightings']['docs'][0].pop('id')
+    assert data['data']['sightings']['docs'][1].pop('id')
+
+    assert data['data']['indicators']['docs'][0].pop('id')
+
+    assert data == EXPECTED_SUCCESS_RESPONSE_WITHOUT_1_CATALOG
+
 
 
 def test_enrich_call_auth_error(route, client, valid_jwt, valid_json,
