@@ -322,6 +322,7 @@ EXPECTED_SUCCESS_RESPONSE = {
                             ]
                         ]
                     },
+                    'description': 'Present in Vidar Stealer',
                     'external_ids': [
                         '90f9c47d-c86d-400f-9a57-38fed22b5fad',
                         '17551',
@@ -411,6 +412,7 @@ EXPECTED_SUCCESS_RESPONSE = {
                             ]
                         ]
                     },
+                    'description': 'Present in Russian Password Stealer',
                     'external_ids': [
                         'd27e8c1e-dd07-4237-bf51-40bcb5744fcc',
                         '17494',
