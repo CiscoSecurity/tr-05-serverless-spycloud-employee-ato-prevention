@@ -59,8 +59,11 @@ def validate_spycloud_outputs(observable, key):
 
             spycloud_breach_catalog = get_spycloud_breach_outputs(
                 url, headers)
-            catalog = spycloud_breach_catalog['results'][0]
-            catalogs.update({catalog['id']: catalog})
+            if spycloud_breach_catalog.get('results'):
+                catalog = spycloud_breach_catalog['results'][0]
+                catalogs.update({catalog['id']: catalog})
+            else:
+                catalogs.update({result["source_id"]: {}})
 
     return spycloud_breach_output, catalogs
 
@@ -190,15 +193,19 @@ def extract_sightings(breach, output, catalogs):
         'external_ids': get_external_ids(breach),
         'severity': get_severity(breach, catalog),
         'targets': [target],
-        'title': current_app.config['CTIM_DEFAULT_SIGHTING_TITLE'].format(
-            title=catalog['title']
-        ),
-        'source_uri': current_app.config['SPYCLOUD_UI_URL'].format(
-            uuid=catalog['uuid']
-        ),
         'data': get_data(breach),
+        'description':
+            current_app.config['CTIM_SIGHTING_TITLE_TEMPLATE'].format(
+                title='breach'),
         **current_app.config['CTIM_SIGHTING_DEFAULT']
     }
+
+    if catalog:
+        doc['source_uri'] = current_app.config['SPYCLOUD_UI_URL'].format(
+                uuid=catalog['uuid'])
+        doc['description'] = \
+            current_app.config['CTIM_SIGHTING_TITLE_TEMPLATE'].format(
+                title=catalog['title'])
 
     return doc
 
@@ -250,6 +257,7 @@ def observe_observables():
 
     g.sightings = []
     g.indicators = []
+    g.errors = []
 
     for observable in observables:
         output, spycloud_catalogs = validate_spycloud_outputs(
@@ -270,9 +278,15 @@ def observe_observables():
 
             catalog_id = breach['source_id']
             if catalog_id not in unique_catalog_id_set:
-                g.indicators.append(
-                    extract_indicators(spycloud_catalogs[catalog_id]))
-                unique_catalog_id_set.add(catalog_id)
+                if spycloud_catalogs[catalog_id]:
+                    g.indicators.append(
+                        extract_indicators(spycloud_catalogs[catalog_id]))
+                    unique_catalog_id_set.add(catalog_id)
+                else:
+                    error_message = \
+                        current_app.config['CATALOG_ERROR_TEMPLATE'].format(
+                            catalog_id=catalog_id)
+                    g.errors.append(error_message)
 
     relay_output = {}
 
@@ -281,7 +295,7 @@ def observe_observables():
     if g.indicators:
         relay_output['indicators'] = format_docs(g.indicators)
 
-    return jsonify_data(relay_output)
+    return jsonify_data(relay_output, g.errors)
 
 
 @enrich_api.route('/refer/observables', methods=['POST'])

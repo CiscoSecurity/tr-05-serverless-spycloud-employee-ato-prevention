@@ -64,8 +64,15 @@ def get_json(schema):
     return data
 
 
-def jsonify_data(data):
-    return jsonify({'data': data})
+def jsonify_data(data, errors=None):
+    data = {
+        'data': data
+    }
+    if errors:
+        data.update({
+            'errors': errors
+        })
+    return jsonify(data)
 
 
 def format_docs(docs):
