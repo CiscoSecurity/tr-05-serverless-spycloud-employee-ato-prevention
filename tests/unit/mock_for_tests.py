@@ -570,7 +570,8 @@ EXPECTED_SUCCESS_RESPONSE_WITHOUT_1_CATALOG = {
                         'rows': [
                             [
                                 '()',
-                                'C:/Users/Usama/AppData/Local/Temp/6210230526.exe',
+                                'C:/Users/Usama/AppData/Local/'
+                                'Temp/6210230526.exe',
                                 '2020-03-26 16:56:49',
                                 '()',
                                 '()',

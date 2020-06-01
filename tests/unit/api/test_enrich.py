@@ -139,7 +139,6 @@ def test_enrich_call_success_without_catalog(route, client, valid_jwt,
     assert data == EXPECTED_SUCCESS_RESPONSE_WITHOUT_1_CATALOG
 
 
-
 def test_enrich_call_auth_error(route, client, valid_jwt, valid_json,
                                 spycloud_api_request):
     spycloud_api_request.return_value = spycloud_api_response(ok=False,
