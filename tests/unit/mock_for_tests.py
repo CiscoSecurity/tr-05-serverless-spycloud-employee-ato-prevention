@@ -137,6 +137,13 @@ CATALOG_17494_RESPONSE_MOCK = {
 }
 
 
+CATALOG_PASS_RESPONSE_MOCK = {
+    "cursor": "",
+    "hits": 0,
+    "results": []
+}
+
+
 EXPECTED_RESPONSE_401_ERROR = {
     'errors': [
         {
@@ -322,6 +329,7 @@ EXPECTED_SUCCESS_RESPONSE = {
                             ]
                         ]
                     },
+                    'description': 'Present in Vidar Stealer',
                     'external_ids': [
                         '90f9c47d-c86d-400f-9a57-38fed22b5fad',
                         '17551',
@@ -411,6 +419,7 @@ EXPECTED_SUCCESS_RESPONSE = {
                             ]
                         ]
                     },
+                    'description': 'Present in Russian Password Stealer',
                     'external_ids': [
                         'd27e8c1e-dd07-4237-bf51-40bcb5744fcc',
                         '17494',
@@ -452,4 +461,263 @@ EXPECTED_SUCCESS_RESPONSE = {
             ]
         }
     }
+}
+
+
+EXPECTED_SUCCESS_RESPONSE_WITHOUT_1_CATALOG = {
+    'data': {
+        'indicators': {
+            'count': 1,
+            'docs': [
+                {
+                    'confidence': 'Low',
+                    'description': 'test description for 17551',
+                    'external_ids': [
+                        '17551',
+                        '3a7fc3d4-2f57-4076-951c-287332a4d1f8'
+                    ],
+                    'external_references': [
+                        {
+                            'description': 'test site description for 17551',
+                            'source_name': 'Spycloud',
+                            'url': 'n/a'
+                        },
+                        {
+                            'description': 'test description for 17551',
+                            'external_id':
+                                '3a7fc3d4-2f57-4076-951c-287332a4d1f8',
+                            'source_name': 'Spycloud',
+                            'url':
+                                'https://portal.spycloud.com/breach/catalog/'
+                                '3a7fc3d4-2f57-4076-951c-287332a4d1f8'
+                        }
+                    ],
+                    'producer': 'Spycloud',
+                    'schema_version': '1.0.16',
+                    'short_description': 'Vidar Stealer',
+                    'tags': [
+                        'username',
+                        'city',
+                        'target_url',
+                        'infected_time',
+                        'user_browser',
+                        'country',
+                        'ip_addresses',
+                        'isp',
+                        'infected_path',
+                        'postal_code',
+                        'password',
+                        'email',
+                        'infected_machine_id'
+                    ],
+                    'title': 'Vidar Stealer',
+                    'type': 'indicator',
+                    'valid_time': {
+                        'start_time': '2020-04-16T00:00:00.000000Z'
+                    }
+                }
+            ]
+        },
+        'sightings': {
+            'count': 2,
+            'docs': [
+                {
+                    'confidence': 'High',
+                    'count': 1,
+                    'data': {
+                        'columns': [
+                            {
+                                'name': 'city',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'infected_path',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'infected_time',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'country',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'isp',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'email',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'password',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'target_url',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'password_plaintext',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'password_type',
+                                'type': 'string'
+                            }
+                        ],
+                        'rows': [
+                            [
+                                '()',
+                                'C:/Users/Usama/AppData/Local/'
+                                'Temp/6210230526.exe',
+                                '2020-03-26 16:56:49',
+                                '()',
+                                '()',
+                                'admin@example.org',
+                                'test123',
+                                'http://localhost:3000/en/session',
+                                'test123',
+                                'plaintext'
+                            ]
+                        ]
+                    },
+                    'description': 'Present in Vidar Stealer',
+                    'external_ids': [
+                        '90f9c47d-c86d-400f-9a57-38fed22b5fad',
+                        '17551',
+                        '0bb046a5-2ef2-4ec3-abbe-ba76f5b78e6c'
+                    ],
+                    'internal': False,
+                    'observables': [
+                        {
+                            'type': 'email',
+                            'value': 'admin@example.org'
+                        }
+                    ],
+                    'observed_time': {
+                        'start_time': '2020-04-16T00:00:00.000000Z'
+                    },
+                    'relations': [],
+                    'schema_version': '1.0.16',
+                    'severity': 'High',
+                    'source': 'Spycloud',
+                    'source_uri': 'https://portal.spycloud.com/breach/catalog/'
+                                  '3a7fc3d4-2f57-4076-951c-287332a4d1f8',
+                    'targets': [
+                        {
+                            'observables': [
+                                {
+                                    'type': 'email',
+                                    'value': 'admin@example.org'
+                                }
+                            ],
+                            'observed_time': {
+                                'start_time': '2020-04-16T00:00:00.000000Z'
+                            },
+                            'type': 'email'
+                        }
+                    ],
+                    'title': 'Reported to Spycloud',
+                    'type': 'sighting'
+                },
+                {
+                    'confidence': 'High',
+                    'count': 6,
+                    'data': {
+                        'columns': [
+                            {
+                                'name': 'target_url',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'user_browser',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'country',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'ip_addresses',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'email',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'password',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'password_plaintext',
+                                'type': 'string'
+                            },
+                            {
+                                'name': 'password_type',
+                                'type': 'string'
+                            }
+                        ],
+                        'rows': [
+                            [
+                                '13.127.174.82',
+                                'Google Chrome New',
+                                'India',
+                                ['210.56.127.202'],
+                                'admin@example.org',
+                                'Admin@1234',
+                                'Admin@1234',
+                                'plaintext'
+                            ]
+                        ]
+                    },
+                    'description': 'Present in breach',
+                    'external_ids': [
+                        'd27e8c1e-dd07-4237-bf51-40bcb5744fcc',
+                        '17494',
+                        '2fc6eba4-738d-11ea-807f-0a7889d429db'
+                    ],
+                    'internal': False,
+                    'observables': [
+                        {
+                            'type': 'email',
+                            'value': 'admin@example.org'
+                        }
+                    ],
+                    'observed_time': {
+                        'start_time': '2020-04-02T00:00:00.000000Z'
+                    },
+                    'relations': [],
+                    'schema_version': '1.0.16',
+                    'severity': 'High',
+                    'source': 'Spycloud',
+                    'targets': [
+                        {
+                            'observables': [
+                                {
+                                    'type': 'email',
+                                    'value': 'admin@example.org'
+                                }
+                            ],
+                            'observed_time': {
+                                'start_time': '2020-04-02T00:00:00.000000Z'
+                            },
+                            'type': 'email'
+                        }
+                    ],
+                    'title': 'Reported to Spycloud',
+                    'type': 'sighting'
+                }
+            ]
+        }
+    },
+    'errors': [
+        {
+            'code': 'not found',
+            'message': 'SpyCloud did not return results for 17494',
+            'type': 'warning'
+        }
+    ]
 }

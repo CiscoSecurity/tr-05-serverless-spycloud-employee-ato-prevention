@@ -62,7 +62,8 @@ class Config:
         'internal': False
     }
 
-    CTIM_DEFAULT_SIGHTING_TITLE = 'Present in {title}'
+    CTIM_SIGHTING_TITLE_TEMPLATE = 'Present in {title}'
+    CATALOG_ERROR_TEMPLATE = 'SpyCloud did not return results for {catalog_id}'
 
     CTIM_INDICATOR_DEFAULT = {
         'type': 'indicator',
