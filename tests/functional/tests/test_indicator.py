@@ -19,11 +19,16 @@ def test_positive_indicators_email_observable(module_headers):
     """
     payload = {'type': 'email', 'value': 'admin@example.org'}
     example_tags = ['password', 'email', 'username', 'target_url']
-    response = enrich_observe_observables(
+    response_from_all_modules = enrich_observe_observables(
         payload=[payload],
         **{'headers': module_headers}
     )['data']
-    indicators = get_observables(response, 'Spycloud')['data']['indicators']
+    response_from_spycloud_module = get_observables(
+        response_from_all_modules, 'Spycloud')
+    assert response_from_spycloud_module['module'] == 'Spycloud'
+    assert response_from_spycloud_module['module_instance_id']
+    assert response_from_spycloud_module['module_type_id']
+    indicators = response_from_spycloud_module['data']['indicators']
     assert len(indicators['docs']) > 0
     for indicator in indicators['docs']:
         assert indicator['type'] == 'indicator'
