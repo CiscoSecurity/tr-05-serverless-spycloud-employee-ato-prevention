@@ -10,3 +10,9 @@ venv/
 
 # dotenv
 .env
+
+# Properties file
+project.properties
+
+# Reporting
+artifacts/
