@@ -264,30 +264,31 @@ def observe_observables():
         output, spycloud_catalogs = validate_spycloud_outputs(
             observable, token)
 
-        breaches = output['results']
-        breaches.sort(
-            key=lambda x: x['spycloud_publish_date'], reverse=True)
+        if output:
+            breaches = output['results']
+            breaches.sort(
+                key=lambda x: x['spycloud_publish_date'], reverse=True)
 
-        unique_catalog_id_set = set()
+            unique_catalog_id_set = set()
 
-        if len(breaches) >= current_app.config['CTR_ENTITIES_LIMIT']:
-            breaches = breaches[:current_app.config['CTR_ENTITIES_LIMIT']]
+            if len(breaches) >= current_app.config['CTR_ENTITIES_LIMIT']:
+                breaches = breaches[:current_app.config['CTR_ENTITIES_LIMIT']]
 
-        for breach in breaches:
-            g.sightings.append(
-                extract_sightings(breach, output, spycloud_catalogs))
+            for breach in breaches:
+                g.sightings.append(
+                    extract_sightings(breach, output, spycloud_catalogs))
 
-            catalog_id = breach['source_id']
-            if catalog_id not in unique_catalog_id_set:
-                if spycloud_catalogs[catalog_id]:
-                    g.indicators.append(
-                        extract_indicators(spycloud_catalogs[catalog_id]))
-                    unique_catalog_id_set.add(catalog_id)
-                else:
-                    error_message = \
-                        current_app.config['CATALOG_ERROR_TEMPLATE'].format(
+                catalog_id = breach['source_id']
+                if catalog_id not in unique_catalog_id_set:
+                    if spycloud_catalogs[catalog_id]:
+                        g.indicators.append(
+                            extract_indicators(spycloud_catalogs[catalog_id]))
+                        unique_catalog_id_set.add(catalog_id)
+                    else:
+                        error_message = current_app.config[
+                            'CATALOG_ERROR_TEMPLATE'].format(
                             catalog_id=catalog_id)
-                    g.errors.append(get_catalog_error(error_message))
+                        g.errors.append(get_catalog_error(error_message))
 
     relay_output = {}
 
