@@ -4,6 +4,7 @@ UNKNOWN = 'unknown'
 NOT_FOUND = 'not found'
 INTERNAL = 'internal error'
 TOO_MANY_REQUESTS = 'too many requests'
+FORBIDDEN = 'forbidden'
 
 
 class TRError(Exception):
@@ -41,6 +42,17 @@ class SpycloudInvalidCredentialsError(TRError):
         super().__init__(
             PERMISSION_DENIED,
             'The request is missing a valid API key.'
+        )
+
+
+class SpycloudForbiddenError(TRError):
+    def __init__(self, payload):
+        error_payload = payload.json()['errorMessage']
+
+        super().__init__(
+            FORBIDDEN,
+            str(error_payload),
+            'warning'
         )
 
 
