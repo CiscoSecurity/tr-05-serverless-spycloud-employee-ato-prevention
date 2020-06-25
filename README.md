@@ -1,6 +1,6 @@
 [![Travis CI Build Status](https://travis-ci.com/CiscoSecurity/tr-05-serverless-spycloud-employee-ato-prevention.svg?branch=develop)](https://travis-ci.com/CiscoSecurity/tr-05-serverless-spycloud-employee-ato-prevention)
 
-# SpyCloud Account Takeover Prevention Relay API
+# SpyCloud Account Takeover Prevention Relay
 
 Concrete Relay implementation using
 [SpyCloud Account Takeover Prevention](https://spycloud.com/products/employee-ato-prevention)
