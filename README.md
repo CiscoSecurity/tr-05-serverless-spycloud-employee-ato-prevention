@@ -272,7 +272,7 @@ header set to `Bearer <JWT>`.
 
 For each entity of the `results[]` received in the response from the `breach/data/emails/<email>` 
 endpoint a request is sent to the `breach/catalog/<id>` endpoint to obtain 
-a catalog of this result.
+a catalog of this entity.
 
 Each response from the SpyCloud API for the supported observables generates
 the following CTIM entities:
@@ -281,4 +281,4 @@ the following CTIM entities:
 - `Indicator` is based on `catalog.results`
 
 Each `Sighting` has the `Leaked_From` relation to the domain `catalog.results[].site`
-if it exist to build `Relations Graph` on the UI.
+if it exists to build `Relations Graph` on the UI.
