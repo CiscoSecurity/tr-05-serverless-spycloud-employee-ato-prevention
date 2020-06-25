@@ -254,7 +254,7 @@ header set to `Bearer <JWT>`.
 
 ```json
 {
-  "key": "<Spycloud_API_KEY>"
+  "key": "<SPYCLOUD_API_KEY>"
 }
 ```
 
@@ -274,7 +274,7 @@ For each entity `results[]` received in response from the `breach/data/emails/<e
 endpoint, a request is sent to the `breach/catalog/<id>` endpoint to obtain 
 a catalog of this result.
 
-Each response from the Spycloud API for the supported observables generates
+Each response from the SpyCloud API for the supported observables generates
 the following CTIM entities:
 
 - `Sighting` is based on `emails.results[]` and `catalog.results[]`
