@@ -51,7 +51,7 @@ class Config:
     except (ValueError, TypeError):
         pass
 
-    CTIM_SCHEMA_VERSION = '1.0.16'
+    CTIM_SCHEMA_VERSION = '1.0.17'
 
     CTIM_SIGHTING_DEFAULT = {
         'type': 'sighting',
