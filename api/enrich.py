@@ -186,7 +186,7 @@ def extract_sightings(breach, output, catalogs):
     }
 
     doc = {
-        'id': f'transient:{uuid4()}',
+        'id': f'transient:sighting-{uuid4()}',
         'count': breach.get('sighting', 1),
         'observables': [observable],
         'observed_time': observed_time,
@@ -221,7 +221,7 @@ def extract_indicators(catalog):
             timespec='microseconds') + 'Z',
     }
 
-    indicator_id = f'transient:{uuid4()}'
+    indicator_id = f'transient:indicator-{uuid4()}'
 
     doc = {
         'id': indicator_id,

@@ -1,0 +1,11 @@
+{
+  "name": "SpyCloud Account Takeover Prevention",
+  "jwt": {
+    "key": "SpyCloud API Key"
+  },
+  "region": {
+    "us": "54215e52-6d6e-499b-a304-59e8fa8ea349",
+    "eu": "e5954252-9b49-4791-a4af-88a64f098afb",
+    "apjc": "6b3313d0-db9c-4ed4-887e-2bafa702fea3"
+  }
+}
