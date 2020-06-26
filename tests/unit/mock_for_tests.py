@@ -213,7 +213,7 @@ EXPECTED_SUCCESS_RESPONSE = {
                         }
                     ],
                     'producer': 'Spycloud',
-                    'schema_version': '1.0.16',
+                    'schema_version': '1.0.17',
                     'short_description': 'Vidar Stealer',
                     'tags': [
                         'username', 'city', 'target_url', 'infected_time',
@@ -249,7 +249,7 @@ EXPECTED_SUCCESS_RESPONSE = {
                         }
                     ],
                     'producer': 'Spycloud',
-                    'schema_version': '1.0.16',
+                    'schema_version': '1.0.17',
                     'short_description': 'Russian Password Stealer',
                     'tags': [
                         'username', 'city', 'target_url',
@@ -346,7 +346,7 @@ EXPECTED_SUCCESS_RESPONSE = {
                         'start_time': '2020-04-16T00:00:00.000000Z'
                     },
                     'relations': [],
-                    'schema_version': '1.0.16',
+                    'schema_version': '1.0.17',
                     'severity': 'High',
                     'source': 'Spycloud',
                     'source_uri': 'https://portal.spycloud.com/breach/catalog/'
@@ -436,7 +436,7 @@ EXPECTED_SUCCESS_RESPONSE = {
                         'start_time': '2020-04-02T00:00:00.000000Z'
                     },
                     'relations': [],
-                    'schema_version': '1.0.16',
+                    'schema_version': '1.0.17',
                     'severity': 'High',
                     'source': 'Spycloud',
                     'source_uri': 'https://portal.spycloud.com/breach/catalog/'
@@ -493,7 +493,7 @@ EXPECTED_SUCCESS_RESPONSE_WITHOUT_1_CATALOG = {
                         }
                     ],
                     'producer': 'Spycloud',
-                    'schema_version': '1.0.16',
+                    'schema_version': '1.0.17',
                     'short_description': 'Vidar Stealer',
                     'tags': [
                         'username',
@@ -600,7 +600,7 @@ EXPECTED_SUCCESS_RESPONSE_WITHOUT_1_CATALOG = {
                         'start_time': '2020-04-16T00:00:00.000000Z'
                     },
                     'relations': [],
-                    'schema_version': '1.0.16',
+                    'schema_version': '1.0.17',
                     'severity': 'High',
                     'source': 'Spycloud',
                     'source_uri': 'https://portal.spycloud.com/breach/catalog/'
@@ -690,7 +690,7 @@ EXPECTED_SUCCESS_RESPONSE_WITHOUT_1_CATALOG = {
                         'start_time': '2020-04-02T00:00:00.000000Z'
                     },
                     'relations': [],
-                    'schema_version': '1.0.16',
+                    'schema_version': '1.0.17',
                     'severity': 'High',
                     'source': 'Spycloud',
                     'targets': [
