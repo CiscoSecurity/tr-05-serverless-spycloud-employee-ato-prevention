@@ -170,6 +170,8 @@ def extract_sightings(breach, output, catalogs):
     observed_time = {
         'start_time': start_time.isoformat(
             timespec='microseconds') + 'Z',
+        'end_time': start_time.isoformat(
+            timespec='microseconds') + 'Z',
     }
 
     observable = {
