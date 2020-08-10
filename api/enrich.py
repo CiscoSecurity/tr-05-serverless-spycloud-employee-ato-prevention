@@ -183,7 +183,8 @@ def extract_sightings(breach, output, catalogs):
             'type': 'email',
             'observables': [observable],
             'observed_time': {
-                'start_time': observed_time['start_time']
+                'start_time': observed_time['start_time'],
+                'end_time': observed_time['start_time']
             }
     }
 
