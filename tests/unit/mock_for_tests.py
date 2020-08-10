@@ -452,7 +452,8 @@ EXPECTED_SUCCESS_RESPONSE = {
                                 }
                             ],
                             'observed_time': {
-                                'start_time': '2020-04-02T00:00:00.000000Z'
+                                'start_time': '2020-04-02T00:00:00.000000Z',
+                                'end_time': '2020-04-02T00:00:00.000000Z'
                             },
                             'type': 'email'
                         }
@@ -617,7 +618,8 @@ EXPECTED_SUCCESS_RESPONSE_WITHOUT_1_CATALOG = {
                                 }
                             ],
                             'observed_time': {
-                                'start_time': '2020-04-16T00:00:00.000000Z'
+                                'start_time': '2020-04-16T00:00:00.000000Z',
+                                'end_time': '2020-04-16T00:00:00.000000Z'
                             },
                             'type': 'email'
                         }
