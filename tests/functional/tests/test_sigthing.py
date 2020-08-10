@@ -91,7 +91,7 @@ def test_positive_sighting_email_observable(module_headers):
 
         for target in sighting['targets']:
             assert target['type'] == observable[0]['type']
-            assert target['observables'] == observable[0]
+            assert target['observables'] == observable
             assert target['observed_time']['start_time'] == (
                 target['observed_time']['end_time']
             )
