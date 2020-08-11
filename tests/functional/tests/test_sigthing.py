@@ -1,5 +1,13 @@
 from ctrlibrary.core.utils import get_observables
 from ctrlibrary.threatresponse.enrich import enrich_observe_observables
+from tests.functional.tests.constants import (
+    CONFIDENCE,
+    SEVERITY,
+    MODULE_NAME,
+    CTR_ENTITIES_LIMIT,
+    SPYCLOUD_URL,
+    SOURCE
+)
 
 
 def test_positive_sighting_email_observable(module_headers):
@@ -17,12 +25,20 @@ def test_positive_sighting_email_observable(module_headers):
 
     Importance: Critical
     """
-    payload = {'type': 'email', 'value': 'admin@example.org'}
-    response = enrich_observe_observables(
-        payload=[payload],
+    observable = [{'type': 'email', 'value': 'admin@example.org'}]
+    response_from_all_modules = enrich_observe_observables(
+        payload=observable,
         **{'headers': module_headers}
     )['data']
-    sightings = get_observables(response, 'Spycloud')['data']['sightings']
+
+    response_from_spycloud_module = get_observables(response_from_all_modules,
+                                                    MODULE_NAME)
+
+    assert response_from_spycloud_module['module'] == MODULE_NAME
+    assert response_from_spycloud_module['module_instance_id']
+    assert response_from_spycloud_module['module_type_id']
+
+    sightings = response_from_spycloud_module['data']['sightings']
     columns_structure = [
         {'name': 'city', 'type': 'string'},
         {'name': 'infected_path', 'type': 'string'},
@@ -49,32 +65,36 @@ def test_positive_sighting_email_observable(module_headers):
 
     for sighting in sightings['docs']:
         assert sighting['type'] == 'sighting'
-        assert sighting['id']
+        assert sighting['description']
+        assert sighting['id'].startswith('transient:sighting-')
         assert sighting['schema_version']
-        assert sighting['source'] == 'Spycloud'
-        assert 'https://portal.spycloud.com/breach/catalog/' in sighting[
-            'source_uri']
-        assert sighting['severity'] in ['Low', 'Medium', 'High']
-        assert sighting['confidence'] in ['Low', 'Medium', 'High']
-        assert sighting['title'] == 'Reported to Spycloud'
+        assert sighting['source'] == SOURCE
+        assert sighting['source_uri'].startswith(SPYCLOUD_URL)
+        assert sighting['severity'] in SEVERITY
+        assert sighting['confidence'] in CONFIDENCE
+        assert sighting['title'] == f'Reported to {MODULE_NAME}'
         assert sighting['count'] > 0
         assert len(sighting['external_ids']) > 0
         assert sighting['internal'] is False
-        assert sighting['observables'][0] == payload
+        assert sighting['observables'] == observable
+        assert sighting['observed_time']['start_time'] == (
+            sighting['observed_time']['end_time']
+        )
 
         if sighting['relations']:
             relation = sighting['relations'][0]
-            assert relation['origin'] == 'Spycloud Breach Module'
+            assert relation['origin'] == f'{MODULE_NAME} Breach Module'
             assert relation['relation'] == 'Leaked_From'
-            assert relation['source'] == {
-                'value': 'admin@example.org', 'type': 'email'}
+            assert relation['source'] == observable[0]
             assert relation['related']['type']
             assert relation['related']['value']
 
         for target in sighting['targets']:
-            assert target['type'] == 'email'
-            assert target['observables'][0] == payload
-            assert 'start_time' in target['observed_time']
+            assert target['type'] == observable[0]['type']
+            assert target['observables'] == observable
+            assert target['observed_time']['start_time'] == (
+                target['observed_time']['end_time']
+            )
 
         assert [
             i for i in sighting['data']['columns']
@@ -82,4 +102,4 @@ def test_positive_sighting_email_observable(module_headers):
         ] == []
         assert 'rows' in sighting['data']
 
-    assert sightings['count'] == len(sightings['docs'])
+    assert sightings['count'] == len(sightings['docs']) <= CTR_ENTITIES_LIMIT
