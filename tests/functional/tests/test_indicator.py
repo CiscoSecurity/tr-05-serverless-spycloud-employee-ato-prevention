@@ -1,5 +1,10 @@
 from ctrlibrary.core.utils import get_observables
 from ctrlibrary.threatresponse.enrich import enrich_observe_observables
+from tests.functional.tests.constants import (
+    MODULE_NAME,
+    CTR_ENTITIES_LIMIT,
+    CONFIDENCE
+)
 
 
 def test_positive_indicators_email_observable(module_headers):
@@ -17,35 +22,36 @@ def test_positive_indicators_email_observable(module_headers):
 
     Importance: Critical
     """
-    payload = {'type': 'email', 'value': 'admin@example.org'}
-    example_tags = ['password', 'email', 'username', 'target_url']
+    observable = [{'type': 'email', 'value': 'admin@example.org'}]
     response_from_all_modules = enrich_observe_observables(
-        payload=[payload],
+        payload=observable,
         **{'headers': module_headers}
     )['data']
     response_from_spycloud_module = get_observables(
-        response_from_all_modules, 'Spycloud')
-    assert response_from_spycloud_module['module'] == 'Spycloud'
+        response_from_all_modules, MODULE_NAME)
+
+    assert response_from_spycloud_module['module'] == MODULE_NAME
     assert response_from_spycloud_module['module_instance_id']
     assert response_from_spycloud_module['module_type_id']
+
     indicators = response_from_spycloud_module['data']['indicators']
     assert len(indicators['docs']) > 0
     for indicator in indicators['docs']:
         assert indicator['type'] == 'indicator'
-        assert indicator['id']
-        assert any(i in indicator['tags'] for i in example_tags)
+        assert indicator['id'].startswith('transient:indicator-')
+        assert indicator['tags']
         assert indicator['schema_version']
-        assert indicator['producer'] == 'Spycloud'
-        assert 'start_time' in indicator['valid_time']
-        assert indicator['confidence'] in ['Low', 'Medium', 'High']
+        assert indicator['producer'] == MODULE_NAME
+        assert indicator['valid_time']['start_time']
+        assert indicator['confidence'] in CONFIDENCE
         assert indicator['title']
         assert indicator['description']
         assert indicator['short_description']
         assert indicator['external_ids']
         if indicator['external_references']:
             assert indicator[
-                'external_references'][0]['source_name'] == 'Spycloud'
+                'external_references'][0]['source_name'] == MODULE_NAME
             assert indicator['external_references'][0]['description']
             assert indicator['external_references'][0]['url']
 
-    assert indicators['count'] == len(indicators['docs'])
+    assert indicators['count'] == len(indicators['docs']) <= CTR_ENTITIES_LIMIT
