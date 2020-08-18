@@ -5,6 +5,7 @@ from http import HTTPStatus
 from authlib.jose import jwt
 from authlib.jose.errors import JoseError
 from flask import request, current_app, jsonify, g
+from requests.exceptions import SSLError
 
 from api.errors import (
     SpycloudInternalServerError,
@@ -15,7 +16,8 @@ from api.errors import (
     BadRequestError,
     SpycloudTooManyRequestsError,
     SpycloudCatalogError,
-    SpycloudForbiddenError
+    SpycloudForbiddenError,
+    SpycloudSSLError
 )
 
 
@@ -122,3 +124,12 @@ def get_response_data(response):
             raise SpycloudForbiddenError(response)
         else:
             raise SpycloudUnexpectedResponseError(response)
+
+
+def catch_ssl_errors(func):
+    def wraps(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except SSLError as error:
+            raise SpycloudSSLError(error)
+    return wraps
