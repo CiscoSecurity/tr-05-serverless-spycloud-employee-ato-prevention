@@ -1,11 +1,18 @@
 import requests
 from flask import Blueprint, current_app
 
-from api.utils import get_jwt, jsonify_data, url_for, get_response_data
+from api.utils import (
+    get_jwt,
+    jsonify_data,
+    url_for,
+    get_response_data,
+    catch_ssl_errors
+)
 
 health_api = Blueprint('health', __name__)
 
 
+@catch_ssl_errors
 def check_spycloud_health():
     url = url_for('watchlist/example.org')
 

@@ -1,6 +1,8 @@
+from http import HTTPStatus
+
 from pytest import fixture
 from unittest import mock
-from http import HTTPStatus
+from requests.exceptions import SSLError
 
 from .utils import headers
 from tests.unit.mock_for_tests import (
@@ -13,7 +15,8 @@ from tests.unit.mock_for_tests import (
     CATALOG_17494_RESPONSE_MOCK,
     CATALOG_17551_RESPONSE_MOCK,
     CATALOG_PASS_RESPONSE_MOCK,
-    EXPECTED_SUCCESS_RESPONSE_WITHOUT_1_CATALOG
+    EXPECTED_SUCCESS_RESPONSE_WITHOUT_1_CATALOG,
+    EXPECTED_RESPONSE_SSL_ERROR
 )
 
 
@@ -181,6 +184,23 @@ def test_enrich_call_500(route, client, valid_jwt, valid_json,
     )
     assert response.status_code == HTTPStatus.OK
     assert response.get_json() == EXPECTED_RESPONSE_500_ERROR
+
+
+def test_enrich_call_ssl_error(route, client, valid_jwt, valid_json,
+                               spycloud_api_request):
+    mock_exception = mock.MagicMock()
+    mock_exception.reason.args.__getitem__().verify_message \
+        = 'self signed certificate'
+    spycloud_api_request.side_effect = SSLError(mock_exception)
+
+    response = client.post(
+        route, headers=headers(valid_jwt), json=valid_json
+    )
+
+    assert response.status_code == HTTPStatus.OK
+
+    data = response.get_json()
+    assert data == EXPECTED_RESPONSE_SSL_ERROR
 
 
 def test_enrich_error_with_data(route, client, valid_jwt, valid_json_multiple,
