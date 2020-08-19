@@ -2,6 +2,7 @@ from http import HTTPStatus
 
 from pytest import fixture
 from unittest import mock
+from requests.exceptions import SSLError
 
 from .utils import headers
 from tests.unit.mock_for_tests import (
@@ -9,7 +10,8 @@ from tests.unit.mock_for_tests import (
     EXPECTED_RESPONSE_404_ERROR,
     EXPECTED_RESPONSE_500_ERROR,
     EXPECTED_RESPONSE_401_ERROR,
-    EXPECTED_RESPONSE_403_ERROR
+    EXPECTED_RESPONSE_403_ERROR,
+    EXPECTED_RESPONSE_SSL_ERROR
 )
 
 
@@ -83,3 +85,17 @@ def test_health_call_500(route, client, valid_jwt, spycloud_api_request):
     response = client.post(route, headers=headers(valid_jwt))
     assert response.status_code == HTTPStatus.OK
     assert response.get_json() == EXPECTED_RESPONSE_500_ERROR
+
+
+def test_enrich_call_ssl_error(route, client, valid_jwt, spycloud_api_request):
+    mock_exception = mock.MagicMock()
+    mock_exception.reason.args.__getitem__().verify_message \
+        = 'self signed certificate'
+    spycloud_api_request.side_effect = SSLError(mock_exception)
+
+    response = client.post(route, headers=headers(valid_jwt))
+
+    assert response.status_code == HTTPStatus.OK
+
+    data = response.get_json()
+    assert data == EXPECTED_RESPONSE_SSL_ERROR

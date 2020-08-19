@@ -729,3 +729,15 @@ EXPECTED_SUCCESS_RESPONSE_WITHOUT_1_CATALOG = {
         }
     ]
 }
+
+
+EXPECTED_RESPONSE_SSL_ERROR = {
+    'errors': [
+        {
+            'code': 'unknown',
+            'message': 'Unable to verify SSL certificate: self signed '
+                       'certificate',
+            'type': 'fatal'
+        }
+    ]
+}
