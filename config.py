@@ -8,7 +8,7 @@ class Config:
 
     SECRET_KEY = os.environ.get('SECRET_KEY', '')
 
-    API_DELAY = 0.25
+    SPYCLOUD_REQUEST_DURATION = 0.25  # in seconds
 
     SPYCLOUD_SOURCE_NAME = 'Spycloud'
 

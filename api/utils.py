@@ -140,7 +140,8 @@ def add_delay(func):
     def wraps(*args, **kwargs):
         start = time.time()
         result = func(*args, **kwargs)
-        pause_time = current_app.config['API_DELAY'] - (time.time() - start)
+        pause_time = current_app.config['SPYCLOUD_REQUEST_DURATION'] - (
+                    time.time() - start)
         if pause_time > 0:
             time.sleep(pause_time)
         return result
