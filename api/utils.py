@@ -138,8 +138,8 @@ def catch_ssl_errors(func):
 
 def add_delay(func):
     """
-    Check request duration and make delay
-    if it's faster than spycloud rate limit
+    Check function duration and make delay
+    if it's faster than time limit
     """
     def wraps(*args, **kwargs):
         start = time.time()
