@@ -138,7 +138,7 @@ def catch_ssl_errors(func):
 
 def add_delay(func):
     """
-    Check function duration and make delay
+    Measures execution time of a function and makes delay
     if it's faster than time limit
     """
     def wraps(*args, **kwargs):
