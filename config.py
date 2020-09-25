@@ -8,6 +8,8 @@ class Config:
 
     SECRET_KEY = os.environ.get('SECRET_KEY', '')
 
+    SPYCLOUD_REQUEST_DURATION = 0.25  # in seconds
+
     SPYCLOUD_SOURCE_NAME = 'Spycloud'
 
     SPYCLOUD_API_URL = 'https://api.spycloud.io/enterprise-v2/{endpoint}'

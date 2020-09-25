@@ -1,5 +1,6 @@
-from typing import Optional
 import json
+import time
+from typing import Optional
 from http import HTTPStatus
 
 from authlib.jose import jwt
@@ -132,4 +133,20 @@ def catch_ssl_errors(func):
             return func(*args, **kwargs)
         except SSLError as error:
             raise SpycloudSSLError(error)
+    return wraps
+
+
+def add_delay(func):
+    """
+    Measures execution time of a function and makes delay
+    if it's faster than time limit
+    """
+    def wraps(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
+        pause_time = current_app.config['SPYCLOUD_REQUEST_DURATION'] - (
+                    time.time() - start)
+        if pause_time > 0:
+            time.sleep(pause_time)
+        return result
     return wraps
