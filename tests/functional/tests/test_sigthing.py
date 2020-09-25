@@ -59,7 +59,9 @@ def test_positive_sighting_email_observable(module_headers):
         {'name': 'account_signup_time', 'type': 'string'},
         {'name': 'account_login_time', 'type': 'string'},
         {'name': 'ip_addresses', 'type': 'string'},
-        {'name': 'username', 'type': 'string'}
+        {'name': 'username', 'type': 'string'},
+        {'name': 'postal_code', 'type': 'string'},
+        {'name': 'country_code', 'type': 'string'}
     ]
     assert len(sightings['docs']) > 0
 
