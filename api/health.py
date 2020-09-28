@@ -18,7 +18,7 @@ def check_spycloud_health():
 
     headers = {
         **current_app.config['SPYCLOUD_BASE_HEADERS'],
-        'X-API-Key': get_jwt().get('key', '')
+        'X-API-Key': get_jwt()
     }
 
     response = requests.get(url, headers=headers)
