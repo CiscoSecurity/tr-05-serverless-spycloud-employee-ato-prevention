@@ -141,7 +141,7 @@ def get_response_data(response):
             raise expected_response_errors[response.status_code]
         elif response.status_code == HTTPStatus.UNAUTHORIZED or \
                 response.status_code == HTTPStatus.FORBIDDEN:
-            raise AuthorizationError(response.get_json()['message'])
+            raise AuthorizationError(response.json()['message'])
         else:
             raise SpycloudUnexpectedResponseError(response)
 
