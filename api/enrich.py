@@ -258,7 +258,7 @@ def observe_observables():
     if not observables:
         return jsonify_data({})
 
-    token = get_jwt().get('key', '')
+    token = get_jwt()
 
     g.sightings = []
     g.indicators = []

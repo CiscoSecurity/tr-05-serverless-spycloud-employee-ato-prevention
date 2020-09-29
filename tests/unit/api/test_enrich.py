@@ -16,7 +16,9 @@ from tests.unit.mock_for_tests import (
     CATALOG_17551_RESPONSE_MOCK,
     CATALOG_PASS_RESPONSE_MOCK,
     EXPECTED_SUCCESS_RESPONSE_WITHOUT_1_CATALOG,
-    EXPECTED_RESPONSE_SSL_ERROR
+    EXPECTED_RESPONSE_SSL_ERROR,
+    SPYCLOUD_401_RESPONSE,
+    SPYCLOUD_403_RESPONSE
 )
 
 
@@ -47,6 +49,7 @@ def spycloud_api_response(*, ok, status_error=None, payload=None):
     else:
         mock_response.status_code = status_error
         mock_response.text = str(payload)
+        mock_response.get_json.return_value = payload
 
     mock_response.json = lambda: payload
 
@@ -144,8 +147,11 @@ def test_enrich_call_success_without_catalog(route, client, valid_jwt,
 
 def test_enrich_call_auth_error(route, client, valid_jwt, valid_json,
                                 spycloud_api_request):
-    spycloud_api_request.return_value = spycloud_api_response(ok=False,
-                                                              status_error=401)
+    spycloud_api_request.return_value = spycloud_api_response(
+        ok=False,
+        status_error=HTTPStatus.UNAUTHORIZED,
+        payload=SPYCLOUD_401_RESPONSE
+    )
     response = client.post(
         route, headers=headers(valid_jwt),  json=valid_json
     )
@@ -155,8 +161,11 @@ def test_enrich_call_auth_error(route, client, valid_jwt, valid_json,
 
 def test_enrich_call_permission_error(route, client, valid_jwt, valid_json,
                                       spycloud_api_request):
-    spycloud_api_request.return_value = spycloud_api_response(ok=False,
-                                                              status_error=403)
+    spycloud_api_request.return_value = spycloud_api_response(
+        ok=False,
+        status_error=HTTPStatus.FORBIDDEN,
+        payload=SPYCLOUD_403_RESPONSE
+    )
     response = client.post(
         route, headers=headers(valid_jwt), json=valid_json
     )
@@ -209,7 +218,8 @@ def test_enrich_error_with_data(route, client, valid_jwt, valid_json_multiple,
         spycloud_api_response(ok=True),
         spycloud_api_response(ok=True, payload=CATALOG_17551_RESPONSE_MOCK),
         spycloud_api_response(ok=True, payload=CATALOG_17494_RESPONSE_MOCK),
-        spycloud_api_response(ok=False, status_error=401)
+        spycloud_api_response(ok=False, status_error=HTTPStatus.FORBIDDEN,
+                              payload=SPYCLOUD_403_RESPONSE)
     )
     response = client.post(
         route, headers=headers(valid_jwt), json=valid_json_multiple
@@ -226,6 +236,6 @@ def test_enrich_error_with_data(route, client, valid_jwt, valid_json_multiple,
 
     expected_response = {}
     expected_response.update(EXPECTED_SUCCESS_RESPONSE)
-    expected_response.update(EXPECTED_RESPONSE_401_ERROR)
+    expected_response.update(EXPECTED_RESPONSE_403_ERROR)
 
     assert data == expected_response

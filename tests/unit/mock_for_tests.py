@@ -144,11 +144,21 @@ CATALOG_PASS_RESPONSE_MOCK = {
 }
 
 
+SPYCLOUD_401_RESPONSE = {
+    "message": "Unauthorized"
+}
+
+
+SPYCLOUD_403_RESPONSE = {
+    "message": "Forbidden"
+}
+
+
 EXPECTED_RESPONSE_401_ERROR = {
     'errors': [
         {
-            'code': 'permission denied',
-            'message': 'The request is missing a valid API key.',
+            'code': 'authorization error',
+            'message': 'Authorization failed: Unauthorized',
             'type': 'fatal'
         }
     ]
@@ -157,9 +167,8 @@ EXPECTED_RESPONSE_401_ERROR = {
 EXPECTED_RESPONSE_403_ERROR = {
     'errors': [
         {
-            'code': 'permission denied',
-            'message': 'The request has API key without necessary '
-                       'permissions.',
+            'code': 'authorization error',
+            'message': 'Authorization failed: Forbidden',
             'type': 'fatal'
         }
     ]

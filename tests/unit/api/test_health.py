@@ -11,7 +11,9 @@ from tests.unit.mock_for_tests import (
     EXPECTED_RESPONSE_500_ERROR,
     EXPECTED_RESPONSE_401_ERROR,
     EXPECTED_RESPONSE_403_ERROR,
-    EXPECTED_RESPONSE_SSL_ERROR
+    EXPECTED_RESPONSE_SSL_ERROR,
+    SPYCLOUD_401_RESPONSE,
+    SPYCLOUD_403_RESPONSE
 )
 
 
@@ -42,6 +44,7 @@ def spycloud_api_response(*, ok, status_error=None, payload=None):
         mock_response.status_code = status_error
 
     mock_response.json = lambda: payload
+    mock_response.get_json.return_value = payload
 
     return mock_response
 
@@ -55,8 +58,11 @@ def test_health_call_success(route, client, valid_jwt, spycloud_api_request):
 
 def test_health_call_auth_error(route, client, valid_jwt,
                                 spycloud_api_request):
-    spycloud_api_request.return_value = spycloud_api_response(ok=False,
-                                                              status_error=401)
+    spycloud_api_request.return_value = spycloud_api_response(
+        ok=False,
+        status_error=HTTPStatus.UNAUTHORIZED,
+        payload=SPYCLOUD_401_RESPONSE
+    )
     response = client.post(route, headers=headers(valid_jwt))
     assert response.status_code == HTTPStatus.OK
     assert response.get_json() == EXPECTED_RESPONSE_401_ERROR
@@ -64,8 +70,11 @@ def test_health_call_auth_error(route, client, valid_jwt,
 
 def test_health_call_permission_error(route, client, valid_jwt,
                                       spycloud_api_request):
-    spycloud_api_request.return_value = spycloud_api_response(ok=False,
-                                                              status_error=403)
+    spycloud_api_request.return_value = spycloud_api_response(
+        ok=False,
+        status_error=HTTPStatus.FORBIDDEN,
+        payload=SPYCLOUD_403_RESPONSE
+    )
     response = client.post(route, headers=headers(valid_jwt))
     assert response.status_code == HTTPStatus.OK
     assert response.get_json() == EXPECTED_RESPONSE_403_ERROR
