@@ -26,7 +26,7 @@ def client(secret_key):
 def valid_jwt(client):
     header = {'alg': 'HS256'}
 
-    payload = {'username': 'gdavoian', 'superuser': False}
+    payload = {'key': 'test_api_key'}
 
     secret_key = client.application.secret_key
 

@@ -1,10 +1,9 @@
 INVALID_ARGUMENT = 'invalid argument'
-PERMISSION_DENIED = 'permission denied'
 UNKNOWN = 'unknown'
 NOT_FOUND = 'not found'
 INTERNAL = 'internal error'
 TOO_MANY_REQUESTS = 'too many requests'
-FORBIDDEN = 'forbidden'
+AUTH_ERROR = 'authorization error'
 
 
 class TRError(Exception):
@@ -34,33 +33,6 @@ class SpycloudNotFoundError(TRError):
         super().__init__(
             NOT_FOUND,
             'The Spycloud not found.'
-        )
-
-
-class SpycloudInvalidCredentialsError(TRError):
-    def __init__(self):
-        super().__init__(
-            PERMISSION_DENIED,
-            'The request is missing a valid API key.'
-        )
-
-
-class SpycloudForbiddenError(TRError):
-    def __init__(self, payload):
-        error_payload = payload.json()['errorMessage']
-
-        super().__init__(
-            FORBIDDEN,
-            str(error_payload),
-            'warning'
-        )
-
-
-class SpycloudForbidenError(TRError):
-    def __init__(self):
-        super().__init__(
-            PERMISSION_DENIED,
-            'The request has API key without necessary permissions.'
         )
 
 
@@ -101,6 +73,15 @@ class SpycloudSSLError(TRError):
         super().__init__(
             UNKNOWN,
             f'Unable to verify SSL certificate: {message}'
+        )
+
+
+class AuthorizationError(TRError):
+    def __init__(self, message):
+
+        super().__init__(
+            AUTH_ERROR,
+            f"Authorization failed: {message}"
         )
 
 
