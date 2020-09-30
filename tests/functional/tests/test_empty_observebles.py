@@ -5,16 +5,18 @@ from tests.functional.tests.constants import MODULE_NAME
 
 def test_positive_smoke_empty_observable(module_headers):
     """Perform testing for enrich observe observables endpoint to
-    check observables is returned empty from Spycloud module
+    check that observable, on which Spycloud doesn't have information,
+    will return empty data
+
 
 
     ID: CCTRI-1695-2b2f141b-d2ac-4a26-a254-2f9524e5ad75
 
     Steps:
-        1. Send request to enrich observe observable endpoint
+        1. Send request to enrich observe observables endpoint
 
     Expectedresults:
-        1.Response body contains empty data dict from Spycloud module
+        1. Response body contains empty data dict from Spycloud module
 
     Importance: Critical
     """
@@ -23,8 +25,10 @@ def test_positive_smoke_empty_observable(module_headers):
         payload=observable,
         **{'headers': module_headers}
     )
-    response_from_spycloud_module = get_observables(
-        response_from_all_modules['data'], MODULE_NAME)
+
+    spycloud_data = response_from_all_modules['data']
+
+    response_from_spycloud_module = get_observables(spycloud_data, MODULE_NAME)
 
     assert response_from_spycloud_module['module'] == MODULE_NAME
     assert response_from_spycloud_module['module_instance_id']
