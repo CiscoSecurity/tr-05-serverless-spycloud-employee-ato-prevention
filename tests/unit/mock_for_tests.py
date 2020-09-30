@@ -750,3 +750,64 @@ EXPECTED_RESPONSE_SSL_ERROR = {
         }
     ]
 }
+
+EXPECTED_AUTHORIZATION_HEADER_ERROR = {
+    'errors': [
+        {
+            'code': 'authorization error',
+            'message': 'Authorization failed: Authorization header is missing',
+            'type': 'fatal'
+        }
+    ]
+}
+
+EXPECTED_AUTHORIZATION_TYPE_ERROR = {
+    'errors': [
+        {
+            'code': 'authorization error',
+            'message': 'Authorization failed: Wrong authorization type',
+            'type': 'fatal'
+        }
+    ]
+}
+
+EXPECTED_JWT_STRUCTURE_ERROR = {
+    'errors': [
+        {
+            'code': 'authorization error',
+            'message': 'Authorization failed: Wrong JWT structure',
+            'type': 'fatal'
+        }
+    ]
+}
+
+EXPECTED_JWT_PAYLOAD_STRUCTURE_ERROR = {
+    'errors': [
+        {
+            'code': 'authorization error',
+            'message': 'Authorization failed: Wrong JWT payload structure',
+            'type': 'fatal'
+        }
+    ]
+}
+
+EXPECTED_WRONG_SECRET_KEY_ERROR = {
+    'errors': [
+        {
+            'code': 'authorization error',
+            'message': 'Authorization failed: Failed to decode JWT with '
+                       'provided key',
+            'type': 'fatal'
+        }
+    ]
+}
+
+EXPECTED_MISSED_SECRET_KEY_ERROR = {
+    'errors': [
+        {
+            'code': 'authorization error',
+            'message': 'Authorization failed: <SECRET_KEY> is missing',
+            'type': 'fatal'
+        }
+    ]
+}

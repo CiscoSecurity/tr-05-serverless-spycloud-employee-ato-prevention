@@ -18,7 +18,13 @@ from tests.unit.mock_for_tests import (
     EXPECTED_SUCCESS_RESPONSE_WITHOUT_1_CATALOG,
     EXPECTED_RESPONSE_SSL_ERROR,
     SPYCLOUD_401_RESPONSE,
-    SPYCLOUD_403_RESPONSE
+    SPYCLOUD_403_RESPONSE,
+    EXPECTED_AUTHORIZATION_HEADER_ERROR,
+    EXPECTED_AUTHORIZATION_TYPE_ERROR,
+    EXPECTED_JWT_STRUCTURE_ERROR,
+    EXPECTED_JWT_PAYLOAD_STRUCTURE_ERROR,
+    EXPECTED_WRONG_SECRET_KEY_ERROR,
+    EXPECTED_MISSED_SECRET_KEY_ERROR
 )
 
 
@@ -239,3 +245,118 @@ def test_enrich_error_with_data(route, client, valid_jwt, valid_json_multiple,
     expected_response.update(EXPECTED_RESPONSE_403_ERROR)
 
     assert data == expected_response
+
+
+def test_enrich_call_auth_header_error(route, client, valid_jwt, valid_json,
+                                       spycloud_api_request):
+    spycloud_api_request.side_effect = (
+        spycloud_api_response(ok=True),
+        spycloud_api_response(ok=True, payload=CATALOG_17551_RESPONSE_MOCK),
+        spycloud_api_response(ok=True, payload=CATALOG_17494_RESPONSE_MOCK),
+    )
+
+    response = client.post(route, headers={}, json=valid_json)
+
+    assert response.status_code == HTTPStatus.OK
+
+    data = response.get_json()
+    assert data == EXPECTED_AUTHORIZATION_HEADER_ERROR
+
+
+def test_enrich_call_auth_type_error(route, client, valid_jwt, valid_json,
+                                     spycloud_api_request):
+    spycloud_api_request.side_effect = (
+        spycloud_api_response(ok=True),
+        spycloud_api_response(ok=True, payload=CATALOG_17551_RESPONSE_MOCK),
+        spycloud_api_response(ok=True, payload=CATALOG_17494_RESPONSE_MOCK),
+    )
+    header = {
+        'Authorization': 'Basic test_jwt'
+    }
+
+    response = client.post(route, headers=header, json=valid_json)
+
+    assert response.status_code == HTTPStatus.OK
+
+    data = response.get_json()
+    assert data == EXPECTED_AUTHORIZATION_TYPE_ERROR
+
+
+def test_enrich_call_jwt_structure_error(route, client, valid_jwt, valid_json,
+                                         spycloud_api_request):
+    spycloud_api_request.side_effect = (
+        spycloud_api_response(ok=True),
+        spycloud_api_response(ok=True, payload=CATALOG_17551_RESPONSE_MOCK),
+        spycloud_api_response(ok=True, payload=CATALOG_17494_RESPONSE_MOCK),
+    )
+    header = {
+        'Authorization': 'Bearer bad_jwt_token'
+    }
+
+    response = client.post(route, headers=header, json=valid_json)
+
+    assert response.status_code == HTTPStatus.OK
+
+    data = response.get_json()
+    assert data == EXPECTED_JWT_STRUCTURE_ERROR
+
+
+def test_enrich_call_payload_structure_error(route, client,
+                                             valid_jwt_with_wrong_payload,
+                                             valid_json, spycloud_api_request):
+    spycloud_api_request.side_effect = (
+        spycloud_api_response(ok=True),
+        spycloud_api_response(ok=True, payload=CATALOG_17551_RESPONSE_MOCK),
+        spycloud_api_response(ok=True, payload=CATALOG_17494_RESPONSE_MOCK),
+    )
+
+    response = client.post(
+        route,
+        headers=headers(valid_jwt_with_wrong_payload),
+        json=valid_json
+    )
+
+    assert response.status_code == HTTPStatus.OK
+
+    data = response.get_json()
+    assert data == EXPECTED_JWT_PAYLOAD_STRUCTURE_ERROR
+
+
+def test_enrich_call_wrong_secret_key_error(route, client, valid_jwt,
+                                            valid_json, spycloud_api_request):
+    spycloud_api_request.side_effect = (
+        spycloud_api_response(ok=True),
+        spycloud_api_response(ok=True, payload=CATALOG_17551_RESPONSE_MOCK),
+        spycloud_api_response(ok=True, payload=CATALOG_17494_RESPONSE_MOCK),
+    )
+    right_secret_key = client.application.secret_key
+    client.application.secret_key = 'wrong_key'
+
+    response = client.post(route, headers=headers(valid_jwt), json=valid_json)
+
+    client.application.secret_key = right_secret_key
+
+    assert response.status_code == HTTPStatus.OK
+
+    data = response.get_json()
+    assert data == EXPECTED_WRONG_SECRET_KEY_ERROR
+
+
+def test_enrich_call_missed_secret_key_error(route, client, valid_jwt,
+                                             valid_json, spycloud_api_request):
+    spycloud_api_request.side_effect = (
+        spycloud_api_response(ok=True),
+        spycloud_api_response(ok=True, payload=CATALOG_17551_RESPONSE_MOCK),
+        spycloud_api_response(ok=True, payload=CATALOG_17494_RESPONSE_MOCK),
+    )
+    right_secret_key = client.application.secret_key
+    client.application.secret_key = None
+
+    response = client.post(route, headers=headers(valid_jwt), json=valid_json)
+
+    client.application.secret_key = right_secret_key
+
+    assert response.status_code == HTTPStatus.OK
+
+    data = response.get_json()
+    assert data == EXPECTED_MISSED_SECRET_KEY_ERROR
