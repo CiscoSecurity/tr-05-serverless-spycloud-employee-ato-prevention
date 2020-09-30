@@ -3,12 +3,10 @@ from ctrlibrary.threatresponse.enrich import enrich_observe_observables
 from tests.functional.tests.constants import MODULE_NAME
 
 
-def test_positive_smoke_empty_observable(module_headers):
+def test_positive_smoke_empty_observables(module_headers):
     """Perform testing for enrich observe observables endpoint to
     check that observable, on which Spycloud doesn't have information,
     will return empty data
-
-
 
     ID: CCTRI-1695-2b2f141b-d2ac-4a26-a254-2f9524e5ad75
 
