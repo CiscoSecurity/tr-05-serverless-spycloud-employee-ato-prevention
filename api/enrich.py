@@ -1,4 +1,4 @@
-from uuid import uuid4
+from uuid import uuid4, uuid5
 from functools import partial
 from datetime import datetime
 
@@ -163,6 +163,12 @@ def get_confidence(result):
         return 'Low'
 
 
+def get_transient_id(entity_type, base_value=None):
+    uuid = (uuid5(current_app.config['NAMESPACE_BASE'], base_value)
+            if base_value else uuid4())
+    return f'transient:{entity_type}-{uuid}'
+
+
 def extract_sightings(breach, output, catalogs):
 
     catalog = catalogs[breach['source_id']]
@@ -225,10 +231,7 @@ def extract_indicators(catalog):
             timespec='microseconds') + 'Z',
     }
 
-    indicator_id = f'transient:indicator-{uuid4()}'
-
     doc = {
-        'id': indicator_id,
         'valid_time': valid_time,
         'confidence': get_confidence(catalog),
         'title': catalog['title'],
@@ -239,6 +242,8 @@ def extract_indicators(catalog):
         'tags': list(catalog['assets'].keys()) or [],
         **current_app.config['CTIM_INDICATOR_DEFAULT']
     }
+
+    doc.update(id=get_transient_id('indicator', str(doc)))
 
     return doc
 
