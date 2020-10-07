@@ -232,6 +232,7 @@ def extract_indicators(catalog):
     }
 
     doc = {
+        'id': get_transient_id('indicator', str(catalog['id'])),
         'valid_time': valid_time,
         'confidence': get_confidence(catalog),
         'title': catalog['title'],
@@ -242,8 +243,6 @@ def extract_indicators(catalog):
         'tags': list(catalog['assets'].keys()) or [],
         **current_app.config['CTIM_INDICATOR_DEFAULT']
     }
-
-    doc.update(id=get_transient_id('indicator', str(doc)))
 
     return doc
 
