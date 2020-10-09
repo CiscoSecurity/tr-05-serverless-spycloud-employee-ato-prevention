@@ -3,7 +3,8 @@ from ctrlibrary.threatresponse.enrich import enrich_observe_observables
 from tests.functional.tests.constants import (
     MODULE_NAME,
     CTR_ENTITIES_LIMIT,
-    CONFIDENCE
+    CONFIDENCE,
+    SOURCE
 )
 
 
@@ -41,7 +42,7 @@ def test_positive_indicators_email_observable(module_headers):
         assert indicator['id'].startswith('transient:indicator-')
         assert indicator['tags']
         assert indicator['schema_version']
-        assert indicator['producer'] == MODULE_NAME
+        assert indicator['producer'] == SOURCE
         assert indicator['valid_time']['start_time']
         assert indicator['confidence'] in CONFIDENCE
         assert indicator['title']
@@ -50,7 +51,7 @@ def test_positive_indicators_email_observable(module_headers):
         assert indicator['external_ids']
         if indicator['external_references']:
             assert indicator[
-                'external_references'][0]['source_name'] == MODULE_NAME
+                'external_references'][0]['source_name'] == SOURCE
             assert indicator['external_references'][0]['description']
             assert indicator['external_references'][0]['url']
 
