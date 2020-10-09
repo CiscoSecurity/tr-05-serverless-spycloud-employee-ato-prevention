@@ -74,7 +74,7 @@ def test_positive_sighting_email_observable(module_headers):
         assert sighting['source_uri'].startswith(SPYCLOUD_URL)
         assert sighting['severity'] in SEVERITY
         assert sighting['confidence'] in CONFIDENCE
-        assert sighting['title'] == f'Reported to {MODULE_NAME}'
+        assert sighting['title'] == f'Reported to {SOURCE}'
         assert sighting['count'] > 0
         assert len(sighting['external_ids']) > 0
         assert sighting['internal'] is False
@@ -85,7 +85,7 @@ def test_positive_sighting_email_observable(module_headers):
 
         if sighting['relations']:
             relation = sighting['relations'][0]
-            assert relation['origin'] == f'{MODULE_NAME} Breach Module'
+            assert relation['origin'] == f'{SOURCE} Breach Module'
             assert relation['relation'] == 'Leaked_From'
             assert relation['source'] == observable[0]
             assert relation['related']['type']
