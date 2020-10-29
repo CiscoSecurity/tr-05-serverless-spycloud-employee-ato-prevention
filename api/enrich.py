@@ -197,7 +197,7 @@ def extract_sightings(breach, output, catalogs):
 
     doc = {
         'id': f'transient:sighting-{uuid4()}',
-        'count': breach.get('sighting', 1),
+        'count': breach.get('sighting') or 1,
         'observables': [observable],
         'observed_time': observed_time,
         'relations': get_relations(observable, catalog),
