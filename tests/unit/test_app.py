@@ -14,6 +14,7 @@ def calls():
     yield Call('DELETE', '/delete', HTTPStatus.NOT_FOUND)
 
     yield Call('GET', '/health', HTTPStatus.METHOD_NOT_ALLOWED)
+    yield Call('GET', '/version', HTTPStatus.METHOD_NOT_ALLOWED)
     yield Call('GET', '/deliberate/observables', HTTPStatus.METHOD_NOT_ALLOWED)
     yield Call('GET', '/observe/observables', HTTPStatus.METHOD_NOT_ALLOWED)
     yield Call('GET', '/refer/observables', HTTPStatus.METHOD_NOT_ALLOWED)
