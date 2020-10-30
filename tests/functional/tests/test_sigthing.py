@@ -29,7 +29,7 @@ def test_positive_sighting_email_observable(module_headers):
     response_from_all_modules = enrich_observe_observables(
         payload=observable,
         **{'headers': module_headers}
-    )['data']
+    )
 
     response_from_spycloud_module = get_observables(response_from_all_modules,
                                                     MODULE_NAME)
