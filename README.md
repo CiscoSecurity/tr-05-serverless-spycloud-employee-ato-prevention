@@ -243,6 +243,9 @@ header set to `Bearer <JWT>`.
     - `Sighting`,
     - `Indicator`.
 
+- `POST /version`
+  - Returns the current version of the application.
+
 ### Supported Types of Observables
 
 - `email`
