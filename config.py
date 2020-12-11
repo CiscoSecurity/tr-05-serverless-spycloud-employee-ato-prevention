@@ -18,7 +18,7 @@ class Config:
 
     SPYCLOUD_BASE_HEADERS = {
         'Accept': 'application/json',
-        'User-Agent': ('Cisco Threat Response Integrations '
+        'User-Agent': ('SecureX Threat Response Integrations '
                        '<tr-integrations-support@cisco.com>')
     }
 
