@@ -18,8 +18,6 @@ from tests.unit.mock_for_tests import (
     EXPECTED_AUTHORIZATION_TYPE_ERROR,
     EXPECTED_JWT_STRUCTURE_ERROR,
     EXPECTED_JWT_PAYLOAD_STRUCTURE_ERROR,
-    EXPECTED_WRONG_SECRET_KEY_ERROR,
-    EXPECTED_MISSED_SECRET_KEY_ERROR
 )
 
 from ..conftest import spycloud_api_response
@@ -51,8 +49,8 @@ def test_health_call_auth_error(route, client, valid_jwt,
         spycloud_api_response(payload=EXPECTED_RESPONSE_OF_JWKS_ENDPOINT),
         spycloud_api_response(
             status_code=HTTPStatus.UNAUTHORIZED,
-            payload=SPYCLOUD_401_RESPONSE
-    ))
+            payload=SPYCLOUD_401_RESPONSE)
+    )
     response = client.post(route, headers=headers(valid_jwt()))
     assert response.status_code == HTTPStatus.OK
     assert response.get_json() == EXPECTED_RESPONSE_401_ERROR
@@ -64,8 +62,8 @@ def test_health_call_permission_error(route, client, valid_jwt,
         spycloud_api_response(payload=EXPECTED_RESPONSE_OF_JWKS_ENDPOINT),
         spycloud_api_response(
             status_code=HTTPStatus.FORBIDDEN,
-            payload=SPYCLOUD_403_RESPONSE
-    ))
+            payload=SPYCLOUD_403_RESPONSE)
+    )
     response = client.post(route, headers=headers(valid_jwt()))
     assert response.status_code == HTTPStatus.OK
     assert response.get_json() == EXPECTED_RESPONSE_403_ERROR

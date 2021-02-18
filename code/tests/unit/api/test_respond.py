@@ -27,5 +27,6 @@ def valid_json(route):
 
 
 def test_respond_call_success(route, client, valid_jwt, valid_json):
-    response = client.post(route, headers=headers(valid_jwt()), json=valid_json)
+    response = client.post(route, headers=headers(valid_jwt()),
+                           json=valid_json)
     assert response.status_code == HTTPStatus.OK

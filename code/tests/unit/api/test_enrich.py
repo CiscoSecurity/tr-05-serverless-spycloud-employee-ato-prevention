@@ -1,10 +1,9 @@
-from http import HTTPStatus
-
-from pytest import fixture
 from unittest import mock
+from .utils import headers
+from pytest import fixture
+from http import HTTPStatus
 from requests.exceptions import SSLError
 
-from .utils import headers
 from tests.unit.mock_for_tests import (
     BREACH_EMAIL_RESPONSE_MOCK,
     EXPECTED_SUCCESS_RESPONSE,
@@ -23,8 +22,6 @@ from tests.unit.mock_for_tests import (
     EXPECTED_AUTHORIZATION_TYPE_ERROR,
     EXPECTED_JWT_STRUCTURE_ERROR,
     EXPECTED_JWT_PAYLOAD_STRUCTURE_ERROR,
-    EXPECTED_WRONG_SECRET_KEY_ERROR,
-    EXPECTED_MISSED_SECRET_KEY_ERROR
 )
 
 from ..conftest import spycloud_api_response
@@ -135,7 +132,8 @@ def test_enrich_call_auth_error(route, client, valid_jwt, valid_json,
                                 mock_request):
     mock_request.side_effect = (
         spycloud_api_response(payload=EXPECTED_RESPONSE_OF_JWKS_ENDPOINT),
-        spycloud_api_response(status_code=HTTPStatus.UNAUTHORIZED, payload=SPYCLOUD_401_RESPONSE)
+        spycloud_api_response(status_code=HTTPStatus.UNAUTHORIZED,
+                              payload=SPYCLOUD_401_RESPONSE)
     )
     response = client.post(
         route, headers=headers(valid_jwt()),  json=valid_json
@@ -148,7 +146,8 @@ def test_enrich_call_permission_error(route, client, valid_jwt, valid_json,
                                       mock_request):
     mock_request.side_effect = (
         spycloud_api_response(payload=EXPECTED_RESPONSE_OF_JWKS_ENDPOINT),
-        spycloud_api_response(status_code=HTTPStatus.FORBIDDEN, payload=SPYCLOUD_403_RESPONSE)
+        spycloud_api_response(status_code=HTTPStatus.FORBIDDEN,
+                              payload=SPYCLOUD_403_RESPONSE)
     )
     response = client.post(
         route, headers=headers(valid_jwt()), json=valid_json

@@ -76,8 +76,8 @@ def get_public_key(jwks_host, token):
 
 def get_jwt():
     """
-    Get Authorization token and validate its signature
-    against the application's secret key, .
+    Get authorization token and validate its signature against the public key
+    from /.well-known/jwks endpoint
     """
 
     expected_errors = {
