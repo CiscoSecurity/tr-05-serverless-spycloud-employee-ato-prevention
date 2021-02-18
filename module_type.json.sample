@@ -1,0 +1,71 @@
+{
+  "title": "SpyCloud Account Takeover Prevention",
+  "default_name": "SpyCloud ATP",
+  "short_description": "SpyCloud helps enterprises prevent corporate account takeover by detecting stolen passwords early, before criminals have a chance to use them.",
+  "description": "It's human nature: people reuse passwords. Unfortunately, your employees' bad password hygiene may put your enterprise at risk of a data breach. According to the 2020 Verizon Data Breach Investigations Report, stolen credentials have been the top hacking technique for four years in a row. Criminals count on employees' password reuse, testing stolen credentials against a variety of other sites - including corporate login portals - to take over accounts and access sensitive customer data, financial information, and intellectual property.\n\n SpyCloud helps enterprises prevent corporate account takeover by detecting exposed credentials quickly, before criminals have a chance to use them against your enterprise. SpyCloud provides fast, high-volume access to stolen data circulating within criminal communities, drawing on a collection and curation platform that has operationalized over 100 billion recovered breach assets for security teams. By checking your employee logins against the largest repository of recovered stolen credentials in the world, you can reset compromised passwords swiftly and safeguard your sensitive corporate assets.",
+  "tips": "When configuring the SpyCloud Account Takeover Prevention integration, you must first gather some information from your SpyCloud account, deploy the [SpyCloud Serverless Relay](https://github.com/CiscoSecurity/tr-05-serverless-spycloud-employee-ato-prevention), and then add the SpyCloud Module\n\n1. Log into SpyCloud, click on your **email address** in the top right corner, choose **API Keys**\n2. Click on the **eye icon** next to the Employee ATO Protection **API Key** \n3. Copy the **API Key** into a file, or leave the tab open\n4. Deploy [SpyCloud Serverless Relay](https://github.com/CiscoSecurity/tr-05-serverless-spycloud-employee-ato-prevention#spycloud-relay-api)\n5. Complete the **Add New SpyCloud Module** form:\n    - **Module Name** - Leave the default name or enter a name that is meaningful to you\n    - **URL** - The URL of the SpyCloud Serverless Relay\n    - **Authorization Bearer** - Enter the encoded JWT containing the SpyCloud API Key\n6. Click **Save** to complete the SpyCloud module configuration",
+  "external_references": [
+    {
+      "label": "Free Trial",
+      "link": "https://spycloud.com/request-a-demo/?utm_campaign=cisco&utm_source=cisco"
+    },
+    {
+      "label": "Case Study",
+      "link": "https://spycloud.com/resource/global-networking-company/?utm_campaign=cisco&utm_source=cisco"
+    },
+    {
+      "label": "Whitepaper",
+      "link": "https://spycloud.com/resource/considerations-for-choosing-an-account-takeover-security-solution/?utm_campaign=cisco&utm_source=cisco"
+    },
+    {
+      "label": "Product Overview",
+      "link": "https://spycloud.com/products/employee-ato-prevention/?utm_campaign=cisco&utm_source=cisco"
+    }
+  ],
+  "configuration_spec": [
+    {
+      "key": "url",
+      "type": "string",
+      "label": "URL",
+      "required": true,
+      "tooltip": "The base URL of the Serverless Relay"
+    },
+    {
+      "key": "custom_key",
+      "type": "api_key",
+      "label": "API Key",
+      "tooltip": "The SpyCloud Account Takeover Prevention API Key",
+      "required": true
+    },
+    {
+      "key": "custom_CTR_ENTITIES_LIMIT",
+      "type": "integer",
+      "label": "Entities Limit",
+      "tooltip": "Restricts the maximum number of `Sightings` and `Indicators`",
+      "required": false
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "health",
+      "description": "Check the health of the SpyCloud API."
+    },
+    {
+      "id": "observe",
+      "description": "Query SpyCloud for Email observable return Sighting and Indicator associated for each breach record."
+    }
+  ],
+  "properties": {
+    "supported-apis": [
+      "health",
+      "observe/observables"
+    ],
+    "auth-type": "configuration-token",
+    "configuration-token-alg": "RS256",
+    "custom_jwks_host": "visibility.amp.cisco.com"
+  },
+  "flags": [
+    "serverless"
+  ],
+  "logo": "data:image/png;base64,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"
+}

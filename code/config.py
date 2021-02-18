@@ -1,12 +1,12 @@
-import os
+import json
+
 from uuid import NAMESPACE_X500
-from __version__ import VERSION
 
 
 class Config:
-    VERSION = VERSION
+    settings = json.load(open('container_settings.json', 'r'))
+    VERSION = settings["VERSION"]
 
-    SECRET_KEY = os.environ.get('SECRET_KEY', None)
     NAMESPACE_BASE = NAMESPACE_X500
 
     SPYCLOUD_REQUEST_DURATION = 0.25  # in seconds
@@ -45,14 +45,6 @@ class Config:
     ]
 
     CTR_DEFAULT_ENTITIES_LIMIT = 100
-    CTR_ENTITIES_LIMIT = CTR_DEFAULT_ENTITIES_LIMIT
-
-    try:
-        limit = int(os.environ.get('CTR_ENTITIES_LIMIT'))
-        if limit > 0:
-            CTR_ENTITIES_LIMIT = limit
-    except (ValueError, TypeError):
-        pass
 
     CTIM_SCHEMA_VERSION = '1.0.17'
 
