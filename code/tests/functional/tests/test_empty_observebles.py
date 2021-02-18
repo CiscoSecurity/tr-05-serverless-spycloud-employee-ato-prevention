@@ -1,6 +1,6 @@
 from ctrlibrary.core.utils import get_observables
 from ctrlibrary.threatresponse.enrich import enrich_observe_observables
-from tests import MODULE_NAME
+from tests.functional.tests.constants import MODULE_NAME
 
 
 def test_positive_smoke_empty_observables(module_headers):

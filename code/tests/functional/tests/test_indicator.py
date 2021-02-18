@@ -1,6 +1,6 @@
 from ctrlibrary.core.utils import get_observables
 from ctrlibrary.threatresponse.enrich import enrich_observe_observables
-from tests import (
+from tests.functional.tests.constants import (
     MODULE_NAME,
     CTR_ENTITIES_LIMIT,
     CONFIDENCE,
