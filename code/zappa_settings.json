@@ -2,7 +2,7 @@
     "dev": {
         "app_function": "app.app",
         "aws_region": "us-east-1",
-        "exclude": [".*", "*.json", "*.md", "*.txt"],
+        "exclude": [".*", "zappa_settings.json", "*.md", "*.txt"],
         "keep_warm": false,
         "log_level": "INFO",
         "manage_roles": false,
