@@ -27,6 +27,9 @@ from tests.unit.mock_for_tests import (
     EXPECTED_MISSED_SECRET_KEY_ERROR
 )
 
+from ..conftest import spycloud_api_response
+from ..mock_for_tests import EXPECTED_RESPONSE_OF_JWKS_ENDPOINT
+
 
 def routes():
     yield '/observe/observables'
@@ -37,31 +40,6 @@ def route(request):
     return request.param
 
 
-@fixture(scope='function')
-def spycloud_api_request():
-    with mock.patch('requests.get') as mock_request:
-        yield mock_request
-
-
-def spycloud_api_response(*, ok, status_error=None, payload=None):
-    mock_response = mock.MagicMock()
-
-    mock_response.ok = ok
-
-    if ok:
-        if not payload:
-            payload = BREACH_EMAIL_RESPONSE_MOCK
-
-    else:
-        mock_response.status_code = status_error
-        mock_response.text = str(payload)
-        mock_response.get_json.return_value = payload
-
-    mock_response.json = lambda: payload
-
-    return mock_response
-
-
 @fixture(scope='module')
 def invalid_json():
     return [{'type': 'unknown', 'value': ''}]
@@ -70,7 +48,7 @@ def invalid_json():
 def test_enrich_call_with_invalid_json_failure(route, client, valid_jwt,
                                                invalid_json):
     response = client.post(
-        route, headers=headers(valid_jwt), json=invalid_json
+        route, headers=headers(valid_jwt()), json=invalid_json
     )
 
     expected_payload = {
@@ -101,16 +79,17 @@ def valid_json_multiple():
 
 
 def test_enrich_call_success(route, client, valid_jwt, valid_json,
-                             spycloud_api_request):
+                             mock_request):
 
-    spycloud_api_request.side_effect = (
-        spycloud_api_response(ok=True),
-        spycloud_api_response(ok=True, payload=CATALOG_17551_RESPONSE_MOCK),
-        spycloud_api_response(ok=True, payload=CATALOG_17494_RESPONSE_MOCK),
+    mock_request.side_effect = (
+        spycloud_api_response(payload=EXPECTED_RESPONSE_OF_JWKS_ENDPOINT),
+        spycloud_api_response(payload=BREACH_EMAIL_RESPONSE_MOCK),
+        spycloud_api_response(payload=CATALOG_17551_RESPONSE_MOCK),
+        spycloud_api_response(payload=CATALOG_17494_RESPONSE_MOCK),
     )
 
     response = client.post(
-        route, headers=headers(valid_jwt), json=valid_json
+        route, headers=headers(valid_jwt()), json=valid_json
     )
 
     assert response.status_code == HTTPStatus.OK
@@ -127,16 +106,17 @@ def test_enrich_call_success(route, client, valid_jwt, valid_json,
 
 
 def test_enrich_call_success_without_catalog(route, client, valid_jwt,
-                                             valid_json, spycloud_api_request):
+                                             valid_json, mock_request):
 
-    spycloud_api_request.side_effect = (
-        spycloud_api_response(ok=True),
-        spycloud_api_response(ok=True, payload=CATALOG_17551_RESPONSE_MOCK),
-        spycloud_api_response(ok=True, payload=CATALOG_PASS_RESPONSE_MOCK),
+    mock_request.side_effect = (
+        spycloud_api_response(payload=EXPECTED_RESPONSE_OF_JWKS_ENDPOINT),
+        spycloud_api_response(payload=BREACH_EMAIL_RESPONSE_MOCK),
+        spycloud_api_response(payload=CATALOG_17551_RESPONSE_MOCK),
+        spycloud_api_response(payload=CATALOG_PASS_RESPONSE_MOCK),
     )
 
     response = client.post(
-        route, headers=headers(valid_jwt), json=valid_json
+        route, headers=headers(valid_jwt()), json=valid_json
     )
 
     assert response.status_code == HTTPStatus.OK
@@ -152,64 +132,69 @@ def test_enrich_call_success_without_catalog(route, client, valid_jwt,
 
 
 def test_enrich_call_auth_error(route, client, valid_jwt, valid_json,
-                                spycloud_api_request):
-    spycloud_api_request.return_value = spycloud_api_response(
-        ok=False,
-        status_error=HTTPStatus.UNAUTHORIZED,
-        payload=SPYCLOUD_401_RESPONSE
+                                mock_request):
+    mock_request.side_effect = (
+        spycloud_api_response(payload=EXPECTED_RESPONSE_OF_JWKS_ENDPOINT),
+        spycloud_api_response(status_code=HTTPStatus.UNAUTHORIZED, payload=SPYCLOUD_401_RESPONSE)
     )
     response = client.post(
-        route, headers=headers(valid_jwt),  json=valid_json
+        route, headers=headers(valid_jwt()),  json=valid_json
     )
     assert response.status_code == HTTPStatus.OK
     assert response.get_json() == EXPECTED_RESPONSE_401_ERROR
 
 
 def test_enrich_call_permission_error(route, client, valid_jwt, valid_json,
-                                      spycloud_api_request):
-    spycloud_api_request.return_value = spycloud_api_response(
-        ok=False,
-        status_error=HTTPStatus.FORBIDDEN,
-        payload=SPYCLOUD_403_RESPONSE
+                                      mock_request):
+    mock_request.side_effect = (
+        spycloud_api_response(payload=EXPECTED_RESPONSE_OF_JWKS_ENDPOINT),
+        spycloud_api_response(status_code=HTTPStatus.FORBIDDEN, payload=SPYCLOUD_403_RESPONSE)
     )
     response = client.post(
-        route, headers=headers(valid_jwt), json=valid_json
+        route, headers=headers(valid_jwt()), json=valid_json
     )
     assert response.status_code == HTTPStatus.OK
     assert response.get_json() == EXPECTED_RESPONSE_403_ERROR
 
 
 def test_enrich_call_404(route, client, valid_jwt, valid_json,
-                         spycloud_api_request):
-    spycloud_api_request.return_value = spycloud_api_response(ok=False,
-                                                              status_error=404)
+                         mock_request):
+    mock_request.side_effect = (
+        spycloud_api_response(payload=EXPECTED_RESPONSE_OF_JWKS_ENDPOINT),
+        spycloud_api_response(status_code=404)
+    )
     response = client.post(
-        route, headers=headers(valid_jwt), json=valid_json
+        route, headers=headers(valid_jwt()), json=valid_json
     )
     assert response.status_code == HTTPStatus.OK
     assert response.get_json() == EXPECTED_RESPONSE_404_ERROR
 
 
 def test_enrich_call_500(route, client, valid_jwt, valid_json,
-                         spycloud_api_request):
-    spycloud_api_request.return_value = spycloud_api_response(ok=False,
-                                                              status_error=500)
+                         mock_request):
+    mock_request.side_effect = (
+        spycloud_api_response(payload=EXPECTED_RESPONSE_OF_JWKS_ENDPOINT),
+        spycloud_api_response(status_code=500)
+    )
     response = client.post(
-        route, headers=headers(valid_jwt), json=valid_json
+        route, headers=headers(valid_jwt()), json=valid_json
     )
     assert response.status_code == HTTPStatus.OK
     assert response.get_json() == EXPECTED_RESPONSE_500_ERROR
 
 
 def test_enrich_call_ssl_error(route, client, valid_jwt, valid_json,
-                               spycloud_api_request):
+                               mock_request):
     mock_exception = mock.MagicMock()
     mock_exception.reason.args.__getitem__().verify_message \
         = 'self signed certificate'
-    spycloud_api_request.side_effect = SSLError(mock_exception)
+    mock_request.side_effect = (
+        spycloud_api_response(payload=EXPECTED_RESPONSE_OF_JWKS_ENDPOINT),
+        SSLError(mock_exception)
+    )
 
     response = client.post(
-        route, headers=headers(valid_jwt), json=valid_json
+        route, headers=headers(valid_jwt()), json=valid_json
     )
 
     assert response.status_code == HTTPStatus.OK
@@ -219,16 +204,17 @@ def test_enrich_call_ssl_error(route, client, valid_jwt, valid_json,
 
 
 def test_enrich_error_with_data(route, client, valid_jwt, valid_json_multiple,
-                                spycloud_api_request):
-    spycloud_api_request.side_effect = (
-        spycloud_api_response(ok=True),
-        spycloud_api_response(ok=True, payload=CATALOG_17551_RESPONSE_MOCK),
-        spycloud_api_response(ok=True, payload=CATALOG_17494_RESPONSE_MOCK),
-        spycloud_api_response(ok=False, status_error=HTTPStatus.FORBIDDEN,
+                                mock_request):
+    mock_request.side_effect = (
+        spycloud_api_response(payload=EXPECTED_RESPONSE_OF_JWKS_ENDPOINT),
+        spycloud_api_response(payload=BREACH_EMAIL_RESPONSE_MOCK),
+        spycloud_api_response(payload=CATALOG_17551_RESPONSE_MOCK),
+        spycloud_api_response(payload=CATALOG_17494_RESPONSE_MOCK),
+        spycloud_api_response(status_code=HTTPStatus.FORBIDDEN,
                               payload=SPYCLOUD_403_RESPONSE)
     )
     response = client.post(
-        route, headers=headers(valid_jwt), json=valid_json_multiple
+        route, headers=headers(valid_jwt()), json=valid_json_multiple
     )
     assert response.status_code == HTTPStatus.OK
 
@@ -248,11 +234,12 @@ def test_enrich_error_with_data(route, client, valid_jwt, valid_json_multiple,
 
 
 def test_enrich_call_auth_header_error(route, client, valid_jwt, valid_json,
-                                       spycloud_api_request):
-    spycloud_api_request.side_effect = (
-        spycloud_api_response(ok=True),
-        spycloud_api_response(ok=True, payload=CATALOG_17551_RESPONSE_MOCK),
-        spycloud_api_response(ok=True, payload=CATALOG_17494_RESPONSE_MOCK),
+                                       mock_request):
+    mock_request.side_effect = (
+        spycloud_api_response(payload=EXPECTED_RESPONSE_OF_JWKS_ENDPOINT),
+        spycloud_api_response(payload=BREACH_EMAIL_RESPONSE_MOCK),
+        spycloud_api_response(payload=CATALOG_17551_RESPONSE_MOCK),
+        spycloud_api_response(payload=CATALOG_17494_RESPONSE_MOCK),
     )
 
     response = client.post(route, headers={}, json=valid_json)
@@ -264,11 +251,12 @@ def test_enrich_call_auth_header_error(route, client, valid_jwt, valid_json,
 
 
 def test_enrich_call_auth_type_error(route, client, valid_jwt, valid_json,
-                                     spycloud_api_request):
-    spycloud_api_request.side_effect = (
-        spycloud_api_response(ok=True),
-        spycloud_api_response(ok=True, payload=CATALOG_17551_RESPONSE_MOCK),
-        spycloud_api_response(ok=True, payload=CATALOG_17494_RESPONSE_MOCK),
+                                     mock_request):
+    mock_request.side_effect = (
+        spycloud_api_response(payload=EXPECTED_RESPONSE_OF_JWKS_ENDPOINT),
+        spycloud_api_response(payload=BREACH_EMAIL_RESPONSE_MOCK),
+        spycloud_api_response(payload=CATALOG_17551_RESPONSE_MOCK),
+        spycloud_api_response(payload=CATALOG_17494_RESPONSE_MOCK),
     )
     header = {
         'Authorization': 'Basic test_jwt'
@@ -283,11 +271,12 @@ def test_enrich_call_auth_type_error(route, client, valid_jwt, valid_json,
 
 
 def test_enrich_call_jwt_structure_error(route, client, valid_jwt, valid_json,
-                                         spycloud_api_request):
-    spycloud_api_request.side_effect = (
-        spycloud_api_response(ok=True),
-        spycloud_api_response(ok=True, payload=CATALOG_17551_RESPONSE_MOCK),
-        spycloud_api_response(ok=True, payload=CATALOG_17494_RESPONSE_MOCK),
+                                         mock_request):
+    mock_request.side_effect = (
+        spycloud_api_response(payload=EXPECTED_RESPONSE_OF_JWKS_ENDPOINT),
+        spycloud_api_response(payload=BREACH_EMAIL_RESPONSE_MOCK),
+        spycloud_api_response(payload=CATALOG_17551_RESPONSE_MOCK),
+        spycloud_api_response(payload=CATALOG_17494_RESPONSE_MOCK),
     )
     header = {
         'Authorization': 'Bearer bad_jwt_token'
@@ -302,17 +291,18 @@ def test_enrich_call_jwt_structure_error(route, client, valid_jwt, valid_json,
 
 
 def test_enrich_call_payload_structure_error(route, client,
-                                             valid_jwt_with_wrong_payload,
-                                             valid_json, spycloud_api_request):
-    spycloud_api_request.side_effect = (
-        spycloud_api_response(ok=True),
-        spycloud_api_response(ok=True, payload=CATALOG_17551_RESPONSE_MOCK),
-        spycloud_api_response(ok=True, payload=CATALOG_17494_RESPONSE_MOCK),
+                                             valid_jwt,
+                                             valid_json, mock_request):
+    mock_request.side_effect = (
+        spycloud_api_response(payload=EXPECTED_RESPONSE_OF_JWKS_ENDPOINT),
+        spycloud_api_response(payload=BREACH_EMAIL_RESPONSE_MOCK),
+        spycloud_api_response(payload=CATALOG_17551_RESPONSE_MOCK),
+        spycloud_api_response(payload=CATALOG_17494_RESPONSE_MOCK),
     )
 
     response = client.post(
         route,
-        headers=headers(valid_jwt_with_wrong_payload),
+        headers=headers(valid_jwt(wrong_structure=True)),
         json=valid_json
     )
 
@@ -320,43 +310,3 @@ def test_enrich_call_payload_structure_error(route, client,
 
     data = response.get_json()
     assert data == EXPECTED_JWT_PAYLOAD_STRUCTURE_ERROR
-
-
-def test_enrich_call_wrong_secret_key_error(route, client, valid_jwt,
-                                            valid_json, spycloud_api_request):
-    spycloud_api_request.side_effect = (
-        spycloud_api_response(ok=True),
-        spycloud_api_response(ok=True, payload=CATALOG_17551_RESPONSE_MOCK),
-        spycloud_api_response(ok=True, payload=CATALOG_17494_RESPONSE_MOCK),
-    )
-    right_secret_key = client.application.secret_key
-    client.application.secret_key = 'wrong_key'
-
-    response = client.post(route, headers=headers(valid_jwt), json=valid_json)
-
-    client.application.secret_key = right_secret_key
-
-    assert response.status_code == HTTPStatus.OK
-
-    data = response.get_json()
-    assert data == EXPECTED_WRONG_SECRET_KEY_ERROR
-
-
-def test_enrich_call_missed_secret_key_error(route, client, valid_jwt,
-                                             valid_json, spycloud_api_request):
-    spycloud_api_request.side_effect = (
-        spycloud_api_response(ok=True),
-        spycloud_api_response(ok=True, payload=CATALOG_17551_RESPONSE_MOCK),
-        spycloud_api_response(ok=True, payload=CATALOG_17494_RESPONSE_MOCK),
-    )
-    right_secret_key = client.application.secret_key
-    client.application.secret_key = None
-
-    response = client.post(route, headers=headers(valid_jwt), json=valid_json)
-
-    client.application.secret_key = right_secret_key
-
-    assert response.status_code == HTTPStatus.OK
-
-    data = response.get_json()
-    assert data == EXPECTED_MISSED_SECRET_KEY_ERROR
