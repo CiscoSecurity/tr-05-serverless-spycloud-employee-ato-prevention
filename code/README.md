@@ -127,6 +127,15 @@ zappa undeploy dev
 command does not change the current `URL`. The `undeploy` command destroys the
 old `URL` forever.
 
+### SecureX Threat Response Module
+
+Now, the only thing left to do is to follow one of these URLs to navigate 
+to SecureX Threat Response page in your region and create the SpyCloud Account Takeover Prevention module 
+using your Lambda's URL:
+- US: https://securex.us.security.cisco.com/integrations/available/54215e52-6d6e-499b-a304-59e8fa8ea349/new
+- EU: https://securex.eu.security.cisco.com/integrations/available/e5954252-9b49-4791-a4af-88a64f098afb/new
+- APJC: https://securex.apjc.security.cisco.com/integrations/available/6b3313d0-db9c-4ed4-887e-2bafa702fea3/new
+
 ## Step 3: Testing (Optional)
 
 If you want to test the application you have to install a couple of extra
