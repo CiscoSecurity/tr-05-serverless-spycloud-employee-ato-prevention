@@ -34,7 +34,7 @@
       "key": "custom_CTR_ENTITIES_LIMIT",
       "type": "integer",
       "label": "Entities Limit",
-      "tooltip": "Restricts the maximum number of `Sightings` and `Indicators`",
+      "tooltip": "Restricts the maximum number of `Sightings`",
       "required": false
     }
   ],
