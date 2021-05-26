@@ -6,10 +6,6 @@
   "tips": "When configuring this integration, you must first gather some information from your SpyCloud account, and then add the SpyCloud Module\n\n1. Log into SpyCloud, click on your **email address** in the top right corner, choose **API Keys**\n2. Click on the **eye icon** next to the Employee ATO Protection **API Key** \n3. Copy the **API Key** into a file, or leave the tab open\n4. Complete the **Add New SpyCloud Module** form:\n    - **Module Name** - Leave the default name or enter a name that is meaningful to you\n    - Enter the **API Key**\n5. Click **Save** to complete the SpyCloud module configuration",
   "external_references": [
     {
-      "label": "Free Trial",
-      "link": "https://spycloud.com/request-a-demo/?utm_campaign=cisco&utm_source=cisco"
-    },
-    {
       "label": "Case Study",
       "link": "https://spycloud.com/resource/global-networking-company/?utm_campaign=cisco&utm_source=cisco"
     },
