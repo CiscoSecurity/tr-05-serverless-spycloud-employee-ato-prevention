@@ -3,6 +3,7 @@ import json
 import time
 import requests
 
+from json.decoder import JSONDecodeError
 from typing import Optional
 from http import HTTPStatus
 from flask import request, current_app, jsonify, g
@@ -56,6 +57,7 @@ def get_public_key(jwks_host, token):
     expected_errors = {
         ConnectionError: WRONG_JWKS_HOST,
         InvalidURL: WRONG_JWKS_HOST,
+        JSONDecodeError: WRONG_JWKS_HOST,
     }
     try:
         response = requests.get(f"https://{jwks_host}/.well-known/jwks")
@@ -224,7 +226,7 @@ def add_delay(func):
         start = time.time()
         result = func(*args, **kwargs)
         pause_time = current_app.config['SPYCLOUD_REQUEST_DURATION'] - (
-                    time.time() - start)
+            time.time() - start)
         if pause_time > 0:
             time.sleep(pause_time)
         return result
