@@ -69,7 +69,9 @@ def test_positive_sighting_email_observable(module_headers):
         {'name': 'address_1', 'type': 'string'},
         {'name': 'homepage', 'type': 'string'},
         {'name': 'company_name', 'type': 'string'},
-        {'name': 'user_sys_registered_owner', 'type': 'string'}
+        {'name': 'user_sys_registered_owner', 'type': 'string'},
+        {'name': 'user_os', 'type': 'string'},
+        {'name': 'user_hostname', 'type': 'string'}
     ]
     assert len(sightings['docs']) > 0
 
