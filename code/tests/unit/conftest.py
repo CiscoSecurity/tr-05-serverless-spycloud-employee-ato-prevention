@@ -25,13 +25,17 @@ def valid_jwt(client):
             jwks_host='visibility.amp.cisco.com',
             aud='http://localhost',
             kid='02B1174234C29F8EFB69911438F597FF3FFEE6B7',
-            wrong_structure=False
+            wrong_structure=False,
+            wrong_jwks_host=False,
     ):
         payload = {
             'key': key,
             'jwks_host': jwks_host,
             'aud': aud,
         }
+
+        if wrong_jwks_host:
+            payload.pop('jwks_host')
 
         if wrong_structure:
             payload.pop('key')
