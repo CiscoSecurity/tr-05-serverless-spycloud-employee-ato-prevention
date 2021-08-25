@@ -7,7 +7,12 @@ from json.decoder import JSONDecodeError
 from typing import Optional
 from http import HTTPStatus
 from flask import request, current_app, jsonify, g
-from requests.exceptions import ConnectionError, InvalidURL, SSLError
+from requests.exceptions import (
+    ConnectionError,
+    InvalidURL,
+    SSLError,
+    HTTPError,
+)
 from jwt import InvalidSignatureError, InvalidAudienceError, DecodeError
 
 from api.errors import (
@@ -31,7 +36,7 @@ KID_NOT_FOUND = 'kid from JWT header not found in API response'
 WRONG_KEY = ('Failed to decode JWT with provided key. '
              'Make sure domain in custom_jwks_host '
              'corresponds to your SecureX instance region.')
-JWK_HOST_MISSING = ('jwk_host is missing in JWT payload. Make sure '
+JWK_HOST_MISSING = ('jwks_host is missing in JWT payload. Make sure '
                     'custom_jwks_host field is present in module_type')
 WRONG_JWKS_HOST = ('Wrong jwks_host in JWT payload. Make sure domain follows '
                    'the visibility.<region>.cisco.com structure')
@@ -54,13 +59,15 @@ def set_ctr_entities_limit(payload):
 
 
 def get_public_key(jwks_host, token):
-    expected_errors = {
-        ConnectionError: WRONG_JWKS_HOST,
-        InvalidURL: WRONG_JWKS_HOST,
-        JSONDecodeError: WRONG_JWKS_HOST,
-    }
+    expected_errors = (
+        ConnectionError,
+        InvalidURL,
+        JSONDecodeError,
+        HTTPError,
+    )
     try:
         response = requests.get(f"https://{jwks_host}/.well-known/jwks")
+        response.raise_for_status()
         jwks = response.json()
 
         public_keys = {}
@@ -72,8 +79,8 @@ def get_public_key(jwks_host, token):
         kid = jwt.get_unverified_header(token)['kid']
         return public_keys.get(kid)
 
-    except tuple(expected_errors) as error:
-        raise AuthorizationError(expected_errors[error.__class__])
+    except expected_errors:
+        raise AuthorizationError(WRONG_JWKS_HOST)
 
 
 def get_jwt():
@@ -93,10 +100,9 @@ def get_jwt():
 
     token = get_auth_token()
     try:
-        jwks_host = jwt.decode(
-            token, options={'verify_signature': False}
-        ).get('jwks_host')
-        assert jwks_host
+        jwks_payload = jwt.decode(token, options={'verify_signature': False})
+        assert 'jwks_host' in jwks_payload
+        jwks_host = jwks_payload.get('jwks_host')
         key = get_public_key(jwks_host, token)
         aud = request.url_root
         payload = jwt.decode(
