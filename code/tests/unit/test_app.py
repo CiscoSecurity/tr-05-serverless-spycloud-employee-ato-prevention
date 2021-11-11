@@ -16,11 +16,7 @@ def calls():
     yield Call('GET', '/health', HTTPStatus.METHOD_NOT_ALLOWED)
     yield Call('GET', '/version', HTTPStatus.METHOD_NOT_ALLOWED)
     yield Call('POST', '/watchdog', HTTPStatus.METHOD_NOT_ALLOWED)
-    yield Call('GET', '/deliberate/observables', HTTPStatus.METHOD_NOT_ALLOWED)
     yield Call('GET', '/observe/observables', HTTPStatus.METHOD_NOT_ALLOWED)
-    yield Call('GET', '/refer/observables', HTTPStatus.METHOD_NOT_ALLOWED)
-    yield Call('GET', '/respond/observables', HTTPStatus.METHOD_NOT_ALLOWED)
-    yield Call('GET', '/respond/trigger', HTTPStatus.METHOD_NOT_ALLOWED)
 
 
 @fixture(scope='module',

@@ -247,12 +247,6 @@ def extract_indicators(catalog):
     return doc
 
 
-@enrich_api.route('/deliberate/observables', methods=['POST'])
-def deliberate_observables():
-    # Not implemented
-    return jsonify_data({})
-
-
 @enrich_api.route('/observe/observables', methods=['POST'])
 def observe_observables():
     relay_input = get_json(ObservableSchema(many=True))
@@ -306,9 +300,3 @@ def observe_observables():
         relay_output['indicators'] = format_docs(g.indicators)
 
     return jsonify_data(relay_output, g.errors)
-
-
-@enrich_api.route('/refer/observables', methods=['POST'])
-def refer_observables():
-    # Not implemented
-    return jsonify_data([])
