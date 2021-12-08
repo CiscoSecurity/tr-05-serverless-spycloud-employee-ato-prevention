@@ -6,13 +6,15 @@ from api.utils import (
     jsonify_data,
     url_for,
     get_response_data,
-    catch_ssl_errors
+    catch_ssl_errors,
+    catch_auth_errors,
 )
 
 health_api = Blueprint('health', __name__)
 
 
 @catch_ssl_errors
+@catch_auth_errors
 def check_spycloud_health():
     url = url_for('watchlist/example.org')
 
