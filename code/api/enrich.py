@@ -15,7 +15,8 @@ from api.utils import (
     format_docs,
     get_catalog_error,
     catch_ssl_errors,
-    add_delay
+    add_delay,
+    catch_auth_errors,
 )
 
 enrich_api = Blueprint('enrich', __name__)
@@ -73,6 +74,7 @@ def validate_spycloud_outputs(observable, key):
 
 @catch_ssl_errors
 @add_delay
+@catch_auth_errors
 def get_spycloud_breach_outputs(url, headers):
     response = requests.get(url, headers=headers)
     return get_response_data(response)
