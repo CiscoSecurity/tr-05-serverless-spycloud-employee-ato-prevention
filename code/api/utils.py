@@ -12,6 +12,7 @@ from requests.exceptions import (
     InvalidURL,
     SSLError,
     HTTPError,
+    InvalidHeader,
 )
 from jwt import InvalidSignatureError, InvalidAudienceError, DecodeError
 
@@ -40,6 +41,7 @@ JWK_HOST_MISSING = ('jwks_host is missing in JWT payload. Make sure '
                     'custom_jwks_host field is present in module_type')
 WRONG_JWKS_HOST = ('Wrong jwks_host in JWT payload. Make sure domain follows '
                    'the visibility.<region>.cisco.com structure')
+UNAUTHORIZED = 'Unauthorized'
 
 
 def url_for(endpoint) -> Optional[str]:
@@ -236,4 +238,13 @@ def add_delay(func):
         if pause_time > 0:
             time.sleep(pause_time)
         return result
+    return wraps
+
+
+def catch_auth_errors(func):
+    def wraps(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except (UnicodeEncodeError, InvalidHeader):
+            raise AuthorizationError(UNAUTHORIZED)
     return wraps
