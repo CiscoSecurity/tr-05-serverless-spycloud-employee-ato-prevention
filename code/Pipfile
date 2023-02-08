@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-cryptography = "==3.3.2"
+cryptography = "==39.0.1"
 Flask = "==2.0.1"
 marshmallow = "==3.12.1"
 requests = "==2.25.1"
