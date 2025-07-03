@@ -1,0 +1,33 @@
+name: Pipenv Install and Test
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+jobs:
+  unittests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      - name: Install pipenv
+        run: pip install pipenv
+
+      - name: Install dependencies
+        run: pipenv install --dev
+
+      - name: Run tests
+        run: |
+          cd code/
+          pipenv run coverage run --source api/ -m pytest --verbose tests/unit/
+          pipenv run coverage report --fail-under=80
+
+      - name: Run pip-audit
+        run: pipenv run pip-audit

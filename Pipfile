@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+cryptography = "==44.0.1"
+Flask = "==3.0.3"
+marshmallow = "==3.22.0"
+PyJWT = "==2.6.0"
+requests = "==2.32.4"
+censys= "==2.1.9"
+
+[dev-packages]
+black = "==24.8.0"
+coverage = "==7.6.1"
+flake8 = "==7.1.1"
+pip-audit = "==2.7.3"
+pytest = "==8.3.2"
+
+[requires]
+python_version = "3.11"
